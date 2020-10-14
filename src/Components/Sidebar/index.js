@@ -1,8 +1,30 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './sidebar.style.css';
 import { LogoutOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
+
+export const SidebarMenu = [
+  {
+    name: 'My seminar',
+    path: 'my-seminar',
+    exact: true,
+    roleAccess: ['speaker'],
+  },
+  {
+    name: 'All seminar',
+    path: 'seminar',
+    exact: true,
+    roleAccess: ['user'],
+  },
+  {
+    name: 'Management',
+    path: 'manager',
+    exact: true,
+    roleAccess: ['admin'],
+  },
+];
+
 function Sidebar() {
   return (
     <div className='header'>
@@ -18,12 +40,13 @@ function Sidebar() {
       <Divider style={{ marginTop: 0 }} />
       <div className='sidebar'>
         <ul className='sidebar__container'>
-          <li className='sidebar__item'>
-            <NavLink to='/'>My seminar</NavLink>
-          </li>
-          <li className='sidebar__item'>
-            <NavLink to='/'>User</NavLink>
-          </li>
+          {SidebarMenu
+            // .filter(item=>item.roleAccess.includes(role))
+            .map((item, index) => (
+              <li key={index} className='sidebar__item'>
+                <NavLink to={item.path}>{item.name}</NavLink>
+              </li>
+            ))}
         </ul>
       </div>
       <div className='logout'>

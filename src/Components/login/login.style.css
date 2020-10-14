@@ -1,0 +1,75 @@
+.back-drop{
+  position: fixed;
+  top:0;
+  bottom: 0;
+  left:0;
+  right:0;
+
+  background-color: #34495e;
+}
+
+.login-form{
+  width:30vw;
+  min-width: 400px;
+  padding:40px;
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  background-color: #191919;
+  text-align: center;
+}
+
+.login-form h1{
+  color:#FFF;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 2rem;
+}
+
+.login-form p{
+  color:#FFF
+}
+
+.login-form input[type='email'],
+.login-form input[type='text'],
+.login-form input[type='password']{
+  border:0;
+  background:none;
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  border:2px solid #3984db;
+  padding: 14px 10px;
+  width: 200px;
+  outline:none;
+  color :#fff;
+  border-radius: 24px;
+  transition: 0.25s;
+}
+
+.login-form input[type='email']:focus,
+.login-form input[type='text']:focus,
+.login-form input[type='password']:focus{
+  width:280px;
+  border-color:#2ecc71;
+}
+
+.login-form input[type='submit']{
+  border:0;
+  background:none;
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  border:2px solid #2ecc71;
+  padding: 14px 40px;
+  outline:none;
+  color :#fff;
+  border-radius: 24px;
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+.login-form input[type='submit']:hover{
+  background-color: #2ecc71;
+}
