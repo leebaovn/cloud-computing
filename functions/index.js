@@ -2,10 +2,10 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
+const { tuple } = require('antd/lib/_util/type');
 admin.initializeApp();
 
-// Take the text parameter passed to this HTTP endpoint and insert it into
-// Cloud Firestore under the path /messages/:documentId/original
+//Mẫu làm việc với functions
 exports.addMessage = functions.https.onRequest(async (req, res) => {
   // Grab the text parameter.
   const original = req.query.text;
@@ -18,26 +18,70 @@ exports.addMessage = functions.https.onRequest(async (req, res) => {
   res.json({ result: `Message with ID: ${writeResult.id} added.` });
 });
 
-// Listens for new messages added to /messages/:documentId/original and creates an
-// uppercase version of the message to /messages/:documentId/uppercase
-exports.makeUppercase = functions.firestore
-  .document('/messages/{documentId}')
-  .onCreate((snap, context) => {
-    // Grab the current value of what was written to Cloud Firestore.
-    const original = snap.data().original;
-
-    // Access the parameter `{documentId}` with `context.params`
-    functions.logger.log('Uppercasing', context.params.documentId, original);
-
-    const uppercase = original.toUpperCase();
-
-    // You must return a Promise when performing asynchronous tasks inside a Functions such as
-    // writing to Cloud Firestore.
-    // Setting an 'uppercase' field in Cloud Firestore document returns a Promise.
-    return snap.ref.set({ uppercase }, { merge: true });
-  });
-
 exports.newMessage = functions.https.onRequest(async (req, res) => {
   // Send back a message that we've succesfully written the message
   res.json({ result: `Message is added.` });
+});
+
+//Create new user
+exports.createUser = functions.https.onRequest(async (req, res) => {
+  try {
+    const { email, password, name, role } = req.body;
+    const newUser = {
+      email,
+      password,
+      name,
+      role,
+    };
+
+    const addedUser = await admin.firestore().collection('users').add(newUser);
+
+    res.json({ result: `user with ID: ${addedUser.id} added.` }); //message return when create new User
+  } catch (err) {
+    throw err;
+  }
+});
+
+exports.createSeminar = functions.https.onRequest(async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      quantity,
+      authorName,
+      location,
+      timeStart,
+    } = req.body;
+
+    const newSeminar = {
+      title,
+      description,
+      quantity,
+      authorName,
+      location,
+      timeStart,
+    };
+
+    const addedSeminar = await admin
+      .firestore()
+      .collection('seminars')
+      .add(newSeminar);
+    res.json({ seminar: addedSeminar.id });
+  } catch (err) {
+    throw err;
+  }
+});
+
+exports.seminars = functions.https.onRequest(async (req, res) => {
+  try {
+    const seminars = [];
+    const snapshot = await admin.firestore().collection('seminars').get();
+    snapshot.docs.forEach((doc) => {
+      console.log(doc);
+      seminars.push(doc.data());
+    });
+    res.json({ data: seminars });
+  } catch (err) {
+    throw err;
+  }
 });
