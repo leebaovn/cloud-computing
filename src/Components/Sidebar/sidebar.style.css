@@ -52,3 +52,20 @@
   width: 100%;
   flex: 1;
 }
+
+.sidebar__item{
+  width:100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.sidebar__item:hover{
+  background-color:#f1f1f1;
+}
+
+.sidebar__item a{
+  font-size: 1.5rem;
+  color: #f1f
+}
