@@ -2,6 +2,9 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 admin.initializeApp();
 
 //Mẫu làm việc với functions
@@ -15,11 +18,6 @@ exports.addMessage = functions.https.onRequest(async (req, res) => {
     .add({ original: original });
   // Send back a message that we've succesfully written the message
   res.json({ result: `Message with ID: ${writeResult.id} added.` });
-});
-
-exports.newMessage = functions.https.onRequest(async (req, res) => {
-  // Send back a message that we've succesfully written the message
-  res.json({ result: `Message is added.` });
 });
 
 //Create new user
@@ -77,9 +75,18 @@ exports.seminars = functions.https.onRequest(async (req, res) => {
     const snapshot = await admin.firestore().collection('seminars').get();
     snapshot.docs.forEach((doc) => {
       console.log(doc);
-      seminars.push(doc.data());
+      seminars.push({ ...doc.data(), id: doc.id });
     });
     res.json({ data: seminars });
+  } catch (err) {
+    throw err;
+  }
+});
+
+exports.login = functions.https.onRequest(async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const userFound = await admin.firestore().collection('users').where('');
   } catch (err) {
     throw err;
   }
