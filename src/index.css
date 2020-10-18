@@ -12,3 +12,8 @@ ul {
 a {
   text-decoration: none;
 }
+
+.contentWrapper{
+  width:calc(100%-32px);
+  margin: 8px 16px;
+}
