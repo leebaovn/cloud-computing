@@ -3,8 +3,7 @@ const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-
+const cors = require('cors')({ origin: true });
 admin.initializeApp();
 
 //Mẫu làm việc với functions
@@ -84,9 +83,44 @@ exports.seminars = functions.https.onRequest(async (req, res) => {
 });
 
 exports.login = functions.https.onRequest(async (req, res) => {
+  cors(req, res, () => {});
+
   try {
-    const { username, password } = req.body;
-    const userFound = await admin.firestore().collection('users').where('');
+    const { email, password } = req.body;
+    const userFound = await admin
+      .firestore()
+      .collection('users')
+      .where('email', '==', email)
+      .get();
+    if (userFound.empty) {
+      res.json({ message: 'Email or password is incorrect!' });
+    }
+    let ok = false;
+    let user;
+    userFound.forEach((doc) => {
+      if (password === doc.data().password) {
+        ok = true;
+        user = doc.data();
+      }
+    });
+    if (ok) {
+      const { email: userEmail, name, role } = user;
+      const token = await jwt.sign(
+        {
+          name,
+          email: userEmail,
+          role,
+        },
+        'secretKey',
+        {
+          expiresIn: '24h',
+        }
+      );
+
+      res.json({ token });
+    } else {
+      res.json({ message: 'Email or password is incorrect!' });
+    }
   } catch (err) {
     throw err;
   }

@@ -73,3 +73,14 @@
 .login-form input[type='submit']:hover{
   background-color: #2ecc71;
 }
+
+.login-form label{
+  color:#FFF;
+}
+.login-form input[type='radio']{
+  margin-left:1rem;
+}
+
+.login-form label{
+  margin-left:1rem;
+}

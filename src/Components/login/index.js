@@ -1,15 +1,20 @@
 import React, { useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import './login.style.css';
-
+import axios from './../../apis';
 function LoginForm() {
   const emailRef = useRef('');
   const pwdRef = useRef('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(emailRef.current.value, pwdRef.current.value, 'zzzz');
     //handle login here
+    const token = await axios.get('login', {
+      email: emailRef.current.value,
+      password: pwdRef.current.value,
+    });
+    console.log(token, 'zzzz');
   };
   return (
     <>

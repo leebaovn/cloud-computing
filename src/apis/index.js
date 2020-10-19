@@ -1,10 +1,13 @@
 import axios from 'axios';
 import queryString from 'query-string';
-
+const API_URL = 'http://localhost:5001/cloud-computing-5a696/us-central1/';
 const axiosClient = axios.create({
-  baseURL: 'https://us-central1-cloud-computing-5a696.cloudfunctions.net/',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST,GET,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   },
   paramsSerializer: (params) => queryString.stringify(params),
 });
