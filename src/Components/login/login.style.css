@@ -84,3 +84,8 @@
 .login-form label{
   margin-left:1rem;
 }
+
+.login-form .errorMessage{
+  color: #F45;
+  font-size: 1.5rem;
+}

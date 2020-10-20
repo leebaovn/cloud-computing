@@ -3,24 +3,61 @@ const functions = require('firebase-functions');
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
 const jwt = require('jsonwebtoken');
-const cors = require('cors')({ origin: true });
-admin.initializeApp();
+const express = require('express');
 
-//Mẫu làm việc với functions
-exports.addMessage = functions.https.onRequest(async (req, res) => {
-  // Grab the text parameter.
-  const original = req.query.text;
-  // Push the new message into Cloud Firestore using the Firebase Admin SDK.
-  const writeResult = await admin
-    .firestore()
-    .collection('messages')
-    .add({ original: original });
-  // Send back a message that we've succesfully written the message
-  res.json({ result: `Message with ID: ${writeResult.id} added.` });
+const cors = require('cors');
+
+admin.initializeApp();
+const db = admin.firestore();
+
+const app = express();
+app.use(cors({ origin: '*' }));
+
+//middleware
+app.use((req, res, next) => {
+  const authHeader = req.get('Authorization');
+  if (!authHeader) {
+    req.isAuth = false;
+    return next();
+  }
+  const token = authHeader.split(' ')[1]; //Bearer token => token
+  if (!token || token === '') {
+    req.isAuth = false;
+    return next();
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(token, 'secretKey');
+  } catch (err) {
+    req.isAuth = false;
+    return next();
+  }
+  if (!decodedToken) {
+    req.isAuth = false;
+    return next();
+  }
+
+  req.isAuth = true;
+  req.role = decodedToken.role;
+  req.userId = decodedToken.userId;
+  next();
 });
+//Mẫu làm việc với functions
+// exports.addMessage = functions.https.onRequest(async (req, res) => {
+//   // Grab the text parameter.
+//   const original = req.query.text;
+//   // Push the new message into Cloud Firestore using the Firebase Admin SDK.
+//   const writeResult = await admin
+//     .firestore()
+//     .collection('messages')
+//     .add({ original: original });
+//   // Send back a message that we've succesfully written the message
+//   res.json({ result: `Message with ID: ${writeResult.id} added.` });
+// });
 
 //Create new user
-exports.createUser = functions.https.onRequest(async (req, res) => {
+app.post('/createuser', async (req, res) => {
   try {
     const { email, password, name, role } = req.body;
     const newUser = {
@@ -30,7 +67,7 @@ exports.createUser = functions.https.onRequest(async (req, res) => {
       role,
     };
 
-    const addedUser = await admin.firestore().collection('users').add(newUser);
+    const addedUser = await db.collection('users').add(newUser);
 
     res.json({ result: `user with ID: ${addedUser.id} added.` }); //message return when create new User
   } catch (err) {
@@ -38,7 +75,14 @@ exports.createUser = functions.https.onRequest(async (req, res) => {
   }
 });
 
-exports.createSeminar = functions.https.onRequest(async (req, res) => {
+app.post('/createseminar', async (req, res) => {
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization!');
+  }
+  if (req.role === 'audience') {
+    res.send(404, 'You dont have permission to create seminar!');
+  }
+
   try {
     const {
       title,
@@ -48,47 +92,61 @@ exports.createSeminar = functions.https.onRequest(async (req, res) => {
       location,
       timeStart,
     } = req.body;
-
+    if (!title || !timeStart) {
+      res.send(404, 'title and time start are required!');
+    }
     const newSeminar = {
       title,
       description,
-      quantity,
+      quantity: quantity || 50,
       authorName,
       location,
       timeStart,
+      createdBy: req.userId,
     };
 
-    const addedSeminar = await admin
-      .firestore()
-      .collection('seminars')
-      .add(newSeminar);
+    const addedSeminar = await db.collection('seminars').add(newSeminar);
     res.json({ seminar: addedSeminar.id });
   } catch (err) {
     throw err;
   }
 });
 
-exports.seminars = functions.https.onRequest(async (req, res) => {
+app.get('/seminars', async (req, res) => {
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization!');
+  }
+
   try {
     const seminars = [];
-    const snapshot = await admin.firestore().collection('seminars').get();
-    snapshot.docs.forEach((doc) => {
-      console.log(doc);
-      seminars.push({ ...doc.data(), id: doc.id });
-    });
-    res.json({ data: seminars });
+    if (req.role !== 'speaker') {
+      const snapshot = await db.collection('seminars').get();
+      snapshot.docs.forEach((doc) => {
+        seminars.push({ ...doc.data(), id: doc.id });
+      });
+      res.json({ data: seminars });
+    } else {
+      const mySeminars = await db
+        .collection('seminars')
+        .where('createdBy', '==', req.userId)
+        .get();
+      const seminarsQuery = mySeminars.docs.map((seminar) => {
+        return {
+          ...seminar.data(),
+        };
+      });
+
+      res.json({ data: seminarsQuery });
+    }
   } catch (err) {
     throw err;
   }
 });
 
-exports.login = functions.https.onRequest(async (req, res) => {
-  cors(req, res, () => {});
-
+app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const userFound = await admin
-      .firestore()
+    const userFound = await db
       .collection('users')
       .where('email', '==', email)
       .get();
@@ -100,16 +158,17 @@ exports.login = functions.https.onRequest(async (req, res) => {
     userFound.forEach((doc) => {
       if (password === doc.data().password) {
         ok = true;
-        user = doc.data();
+        user = { ...doc.data(), userId: doc.id };
       }
     });
     if (ok) {
-      const { email: userEmail, name, role } = user;
+      const { email: userEmail, name, role, userId } = user;
       const token = await jwt.sign(
         {
           name,
           email: userEmail,
           role,
+          userId,
         },
         'secretKey',
         {
@@ -125,3 +184,5 @@ exports.login = functions.https.onRequest(async (req, res) => {
     throw err;
   }
 });
+
+exports.api = functions.https.onRequest(app);

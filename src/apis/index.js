@@ -1,6 +1,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
-const API_URL = 'http://localhost:5001/cloud-computing-5a696/us-central1/';
+const API_URL =
+  'https://us-central1-cloud-computing-5a696.cloudfunctions.net/api/';
 const axiosClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -14,6 +15,10 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(async (config) => {
   //Process token here
+  const token = window.localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
   return config;
 });
 

@@ -4,11 +4,15 @@ const authContext = createContext();
 
 export default authContext;
 
+export const AuthAction = {
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+};
+
 const INITIAL_STATE = {
-  token: '',
-  isAuth: false,
-  name: '',
-  role: '',
+  token: window.localStorage.getItem('token') || '',
+  name: window.localStorage.getItem('name') || '',
+  role: window.localStorage.getItem('role') || '',
 };
 
 function reducer(state, action) {
@@ -16,18 +20,21 @@ function reducer(state, action) {
     case 'LOGIN':
       if (action.payload.token) {
         window.localStorage.setItem('token', action.payload.token);
+        window.localStorage.setItem('role', action.payload.role);
+        window.localStorage.setItem('name', action.payload.name);
       }
       return {
         ...state,
         token: action.payload.token,
         name: action.payload.name,
-        isAuth: true,
         role: action.payload.role,
       };
 
     case 'LOGOUT':
+      window.localStorage.removeItem('token');
       return {
         ...INITIAL_STATE,
+        token: '',
       };
     default:
       return state;

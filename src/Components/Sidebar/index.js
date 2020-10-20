@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import './sidebar.style.css';
 import { LogoutOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
-
+import authContext, { AuthAction } from './../../contexts/auth/auth-context';
 export const SidebarMenu = [
   {
     name: 'My seminar',
@@ -25,7 +25,12 @@ export const SidebarMenu = [
   },
 ];
 
-function Sidebar() {
+function Sidebar(props) {
+  const [authState, authDispatch] = useContext(authContext);
+  const { role } = authState;
+  const logout = () => {
+    authDispatch({ type: AuthAction.LOGOUT });
+  };
   return (
     <div className='header'>
       <div className='userInfo'>
@@ -40,18 +45,18 @@ function Sidebar() {
       <Divider style={{ marginTop: 0 }} />
       <div className='sidebar'>
         <ul className='sidebar__container'>
-          {SidebarMenu
-            // .filter(item=>item.roleAccess.includes(role))
-            .map((item, index) => (
+          {SidebarMenu.filter((item) => item.roleAccess.indexOf(role) >= 0).map(
+            (item, index) => (
               <li key={index} className='sidebar__item'>
                 <NavLink to={item.path}>{item.name}</NavLink>
               </li>
-            ))}
+            )
+          )}
         </ul>
       </div>
       <div className='logout'>
         <LogoutOutlined />
-        <span>Logout</span>
+        <span onClick={logout}>Logout</span>
       </div>
     </div>
   );
