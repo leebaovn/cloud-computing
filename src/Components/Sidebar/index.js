@@ -33,7 +33,7 @@ export const SidebarMenu = [
 
 function Sidebar(props) {
   const [authState, authDispatch] = useContext(authContext);
-  const { role } = authState;
+  const { role, name } = authState;
   const logout = () => {
     authDispatch({ type: AuthAction.LOGOUT });
   };
@@ -46,7 +46,7 @@ function Sidebar(props) {
             alt='avatar'
           />
         </div>
-        <div className='userInfo__name'>Lee Bảo</div>
+        <div className='userInfo__name'>{name}</div>
       </div>
       <Divider style={{ marginTop: 0 }} />
       <div className='sidebar'>

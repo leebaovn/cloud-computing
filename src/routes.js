@@ -12,11 +12,11 @@ function Routes(props) {
   return (
     <Switch>
       <Route path='/user-management'>
-        <Users />
+        {token ? <Users /> : <Redirect to='/login' />}
       </Route>
 
       <Route path='/seminar-management'>
-        <Seminar />
+        {token ? <Seminar /> : <Redirect to='/login' />}
       </Route>
 
       <Route path='/login' exact>
