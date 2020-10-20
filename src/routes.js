@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import LoginForm from './Components/login';
 import Signup from './Components/login/signup';
 import Seminar from './pages/seminar';
+import Users from './pages/users';
 import authContext from './contexts/auth/auth-context';
 function Routes(props) {
   const [authState, _] = useContext(authContext);
@@ -10,6 +11,14 @@ function Routes(props) {
 
   return (
     <Switch>
+      <Route path='/user-management'>
+        <Users />
+      </Route>
+
+      <Route path='/seminar-management'>
+        <Seminar />
+      </Route>
+
       <Route path='/login' exact>
         {token ? <Redirect to='/' /> : <LoginForm />}
       </Route>

@@ -103,6 +103,7 @@ app.post('/createseminar', async (req, res) => {
       location,
       timeStart,
       createdBy: req.userId,
+      status: 'pending',
     };
 
     const addedSeminar = await db.collection('seminars').add(newSeminar);
@@ -185,4 +186,27 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/users', async (req, res) => {
+  // if (!req.isAuth) {
+  //   res.send(404, 'Unauthorization!');
+  // }
+  // if (req.role !== 'admin') {
+  //   res.send(404, 'You dont have permission');
+  // }
+  const snapshot = await db
+    .collection('users')
+    // .where('role', '==', 'admin')
+    .get();
+  if (!snapshot.empty) {
+    const users = snapshot.docs.map((user) => {
+      return {
+        ...user.data(),
+        id: user.id,
+      };
+    });
+    res.json({ data: users });
+  } else {
+    res.json({ message: 'Not found!' });
+  }
+});
 exports.api = functions.https.onRequest(app);

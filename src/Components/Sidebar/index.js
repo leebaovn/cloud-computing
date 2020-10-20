@@ -18,8 +18,14 @@ export const SidebarMenu = [
     roleAccess: ['user'],
   },
   {
-    name: 'Management',
-    path: 'manager',
+    name: 'User Management',
+    path: 'user-management',
+    exact: true,
+    roleAccess: ['admin'],
+  },
+  {
+    name: 'Seminar Management',
+    path: 'seminar-management',
     exact: true,
     roleAccess: ['admin'],
   },
