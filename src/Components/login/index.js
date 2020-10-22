@@ -6,7 +6,7 @@ import authContext, { AuthAction } from './../../contexts/auth/auth-context';
 import jwt from 'jsonwebtoken';
 import Spinner from '../spinner';
 import openNotification, { typeNotification } from './../notification';
-function LoginForm() {
+function LoginForm({ history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const emailRef = useRef('');
@@ -33,6 +33,7 @@ function LoginForm() {
         },
       });
       setError(null);
+      history.push('/');
       openNotification(typeNotification.success, 'You are logged in!');
     } else {
       // openNotification(typeNotification.warning, data.message);

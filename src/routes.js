@@ -19,31 +19,15 @@ function PrivateRoute({ component: Component, ...rest }) {
   );
 }
 
-function Routes(props) {
-  const [authState, _] = useContext(authContext);
-  const { token, role } = authState;
+function Routes() {
   return (
     <Switch>
-      {!token && <Route path='/login' exact component={LoginForm} />}
-      {!token && <Route path='/sign-up' exact component={Signup} />}
+      <Route path='/login' exact component={LoginForm} />
+      <Route path='/sign-up' exact component={Signup} />
       <PrivateRoute path='/user-management' component={Users} />
-      {/* <Route path='/user-management'>
-        {token ? <Users /> : <Redirect to='/login' />}
-      </Route> */}
+
       <PrivateRoute path='/seminar-management' component={Seminar} />
 
-      {/* <Route path='/seminar-management'>
-        {token ? <Seminar /> : <Redirect to='/login' />}
-      </Route> */}
-
-      {/* <Route path='/login' exact>
-        {token ? <Redirect to='/' /> : <LoginForm />}
-      </Route> */}
-      {/* <Route path='/sign-up' exact>
-        {token ? <Redirect to='/' /> : <Signup />}
-      </Route>
-      {!token && <Redirect to='/login' />} */}
-      {/* <Route path='/' exact component={Seminar} /> */}
       <PrivateRoute path='/' component={Seminar} />
     </Switch>
   );
