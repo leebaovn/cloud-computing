@@ -18,8 +18,14 @@ export const SidebarMenu = [
     roleAccess: ['user'],
   },
   {
-    name: 'Management',
-    path: 'manager',
+    name: 'User Management',
+    path: 'user-management',
+    exact: true,
+    roleAccess: ['admin'],
+  },
+  {
+    name: 'Seminar Management',
+    path: 'seminar-management',
     exact: true,
     roleAccess: ['admin'],
   },
@@ -27,7 +33,7 @@ export const SidebarMenu = [
 
 function Sidebar(props) {
   const [authState, authDispatch] = useContext(authContext);
-  const { role } = authState;
+  const { role, name } = authState;
   const logout = () => {
     authDispatch({ type: AuthAction.LOGOUT });
   };
@@ -40,7 +46,7 @@ function Sidebar(props) {
             alt='avatar'
           />
         </div>
-        <div className='userInfo__name'>Lee Bảo</div>
+        <div className='userInfo__name'>{name}</div>
       </div>
       <Divider style={{ marginTop: 0 }} />
       <div className='sidebar'>
