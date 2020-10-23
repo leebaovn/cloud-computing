@@ -1,23 +1,20 @@
-import axios from 'axios';
-import queryString from 'query-string';
+import axios from "axios";
+import queryString from "query-string";
 const API_URL =
-  'https://us-central1-cloud-computing-5a696.cloudfunctions.net/api/';
+  "https://us-central1-cloud-computing-5a696.cloudfunctions.net/api";
 const axiosClient = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST,GET,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    "Content-Type": "application/json",
   },
   paramsSerializer: (params) => queryString.stringify(params),
 });
 
 axiosClient.interceptors.request.use(async (config) => {
   //Process token here
-  const token = window.localStorage.getItem('token');
+  const token = window.localStorage.getItem("token");
   if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
+    config.headers["Authorization"] = `Bearer ${token}`;
   }
   return config;
 });
