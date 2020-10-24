@@ -15,7 +15,7 @@ export const SidebarMenu = [
     name: 'All seminar',
     path: 'seminar',
     exact: true,
-    roleAccess: ['user'],
+    roleAccess: ['audience'],
   },
   {
     name: 'User Management',

@@ -1,10 +1,12 @@
 const functions = require('firebase-functions');
-
-// The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
-const jwt = require('jsonwebtoken');
+
+require('dotenv').config();
 const express = require('express');
 
+const jwt = require('jsonwebtoken');
+
+const nodeMailer = require('nodemailer');
 const cors = require('cors');
 
 admin.initializeApp();
@@ -13,6 +15,14 @@ const db = admin.firestore();
 const app = express();
 app.use(cors({ origin: '*' }));
 
+const transporter = nodeMailer.createTransport({
+  service: 'Gmail',
+  host: 'gmail.com',
+  auth: {
+    user: process.env.MAIL_ADDRESS,
+    pass: process.env.SECRET_PASSWORD,
+  },
+});
 //middleware
 app.use((req, res, next) => {
   const authHeader = req.get('Authorization');
@@ -43,18 +53,44 @@ app.use((req, res, next) => {
   req.userId = decodedToken.userId;
   next();
 });
-//Mẫu làm việc với functions
-// exports.addMessage = functions.https.onRequest(async (req, res) => {
-//   // Grab the text parameter.
-//   const original = req.query.text;
-//   // Push the new message into Cloud Firestore using the Firebase Admin SDK.
-//   const writeResult = await admin
-//     .firestore()
-//     .collection('messages')
-//     .add({ original: original });
-//   // Send back a message that we've succesfully written the message
-//   res.json({ result: `Message with ID: ${writeResult.id} added.` });
-// });
+
+//Send mail to speaker as if their seminar is accepted or not
+app.post('/seminarpermission', async (req, res) => {
+  if (req.role !== 'admin') {
+    return res.json({ message: 'You dont have permission on this action!' });
+  }
+  try {
+    const { seminarId, status, authorId } = req.body; // get event to update status, get authorId to send mail confirm
+    const authorData = await db.collection('users').doc(authorId).get();
+    if (!authorData.data().email) {
+      return res.json({ message: 'Author not found!' });
+    } else {
+      const authorEmail = authorData.data().email;
+      const mailOptions = {
+        from: process.env.MAIL_ADDRESS,
+        to: authorEmail,
+        subject: 'Confirm seminar',
+        html: `<p>Your seminar was ${status}</p>`,
+      };
+      return transporter.sendMail(mailOptions, async (err, info) => {
+        if (err) {
+          return res.json({ message: `Cannot send mail ${err}` });
+        }
+        const eventFound = db.collection('seminars').doc(seminarId);
+        eventFound
+          .update({ status: status })
+          .then(() => {
+            return res.json({ data: 'Email sent' });
+          })
+          .catch(() => {
+            return res.json({ message: 'Seminar not found' });
+          });
+      });
+    }
+  } catch (err) {
+    return res.json({ message: err });
+  }
+});
 
 //Create new user
 app.post('/createuser', async (req, res) => {
@@ -89,6 +125,7 @@ app.post('/createuser', async (req, res) => {
   }
 });
 
+//create new seminar
 app.post('/createseminar', async (req, res) => {
   if (!req.isAuth) {
     res.send(404, 'Unauthorization!');
@@ -127,6 +164,7 @@ app.post('/createseminar', async (req, res) => {
   }
 });
 
+//Get seminar
 app.get('/seminars', async (req, res) => {
   if (!req.isAuth) {
     res.send(404, 'Unauthorization!');
@@ -158,6 +196,7 @@ app.get('/seminars', async (req, res) => {
   }
 });
 
+//login and return token
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -200,6 +239,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+//get all user to manage
 app.get('/users', async (req, res) => {
   // if (!req.isAuth) {
   //   res.send(404, 'Unauthorization!');
