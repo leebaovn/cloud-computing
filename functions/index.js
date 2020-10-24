@@ -59,19 +59,33 @@ app.use((req, res, next) => {
 //Create new user
 app.post('/createuser', async (req, res) => {
   try {
-    const { email, password, name, role } = req.body;
+    const { email, password, name, role, studentId } = req.body;
+    if (!email || !password || !name) {
+      return res.json({ message: 'You are missing some field' });
+    }
+    const userFound = await db
+      .collection('users')
+      .where('email', '==', email)
+      .get();
+    if (!userFound.empty) {
+      return res.json({
+        message: 'Email is exist. Please choose another email.',
+      });
+    }
     const newUser = {
       email,
       password,
       name,
       role,
+      studentId,
     };
 
     const addedUser = await db.collection('users').add(newUser);
 
     res.json({ result: `user with ID: ${addedUser.id} added.` }); //message return when create new User
   } catch (err) {
-    throw err;
+    // throw err;
+    res.json({ hello: 'fail roi' });
   }
 });
 

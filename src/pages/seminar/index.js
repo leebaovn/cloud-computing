@@ -33,11 +33,9 @@ function SeminarPage() {
         </Card> */}
         {seminars &&
           seminars?.map((seminar) => (
-            <>
-              <p>
-                {seminar.title}-{seminar.quantity}
-              </p>
-            </>
+            <p key={seminar.id}>
+              {seminar.title}-{seminar.quantity}
+            </p>
           ))}
       </div>
     </Layout>

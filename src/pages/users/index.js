@@ -3,6 +3,7 @@ import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
 import axios from './../../apis';
 import { Table, Tag } from 'antd';
+import Spinner from '../../Components/spinner';
 
 const columnUser = [
   {
@@ -37,21 +38,32 @@ const columnUser = [
 
 function SeminarPage() {
   const [users, setUsers] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       const users = await axios.get('/users');
       if (!users.message) {
         setUsers(users.data);
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
+  console.log(users);
   return (
     <Layout>
       <Toolbar title='Users'></Toolbar>
       <div className='contentWrapper'>
-        <Table columns={columnUser} dataSource={users} pagination={false} />
+        <Table
+          columns={columnUser}
+          dataSource={users}
+          pagination={false}
+          loading={{
+            spinning: loading,
+            indicator: <Spinner />,
+          }}
+        />
       </div>
     </Layout>
   );
