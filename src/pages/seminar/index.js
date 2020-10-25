@@ -1,28 +1,16 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
 import { Card } from 'antd';
 import axiosClient from '../../apis';
-=======
-import React, { useEffect, useState } from "react";
-import Toolbar from "./../../Components/Toolbar";
-import Layout from "./../../Components/Layout";
-import { Card } from "antd";
-import axiosClient from "../../apis";
-import DrawerForm from "./../../Components/addSeminar";
+import DrawerForm from './../../Components/addSeminar';
 
->>>>>>> addseminar_button
 const { Meta } = Card;
 function SeminarPage() {
   const [seminars, setSeminars] = useState([]);
   useEffect(() => {
     const fetchSeminar = async () => {
-<<<<<<< HEAD
       const seminars = await axiosClient.get('/seminars');
-=======
-      const seminars = await axiosClient.get("/seminars");
->>>>>>> addseminar_button
       if (!seminars.empty) {
         setSeminars(seminars.data);
       }
@@ -31,15 +19,10 @@ function SeminarPage() {
   }, []);
   return (
     <Layout>
-<<<<<<< HEAD
-      <Toolbar title='Seminar'>Filter</Toolbar>
-      <div className='contentWrapper'>
-=======
-      <Toolbar title="Seminar">
+      <Toolbar title='Seminar'>
         <DrawerForm />
       </Toolbar>
-      <div className="contentWrapper">
->>>>>>> addseminar_button
+      <div className='contentWrapper'>
         {/* <Card
           hoverable
           style={{ width: 240 }}

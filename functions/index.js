@@ -239,21 +239,15 @@ app.post('/login', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 //get all user to manage
-=======
->>>>>>> addseminar_button
 app.get('/users', async (req, res) => {
-  // if (!req.isAuth) {
-  //   res.send(404, 'Unauthorization!');
-  // }
-  // if (req.role !== 'admin') {
-  //   res.send(404, 'You dont have permission');
-  // }
-  const snapshot = await db
-    .collection('users')
-    // .where('role', '==', 'admin')
-    .get();
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization!');
+  }
+  if (req.role !== 'admin') {
+    res.send(404, 'You dont have permission');
+  }
+  const snapshot = await db.collection('users').get();
   if (!snapshot.empty) {
     const users = snapshot.docs.map((user) => {
       return {
