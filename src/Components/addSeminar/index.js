@@ -1,16 +1,17 @@
+import { PlusOutlined } from '@ant-design/icons';
 import {
-  Drawer,
-  Form,
   Button,
   Col,
-  Row,
-  Input,
   DatePicker,
+  Drawer,
+  Form,
+  Input,
+  Row,
   TimePicker,
 } from 'antd';
 import moment from 'moment';
-import { PlusOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
+import Avatar from './upload.js';
 
 const format = 'HH:mm';
 
@@ -109,7 +110,7 @@ const DrawerForm = () => {
               >
                 <TimePicker
                   style={{ width: '100%' }}
-                  defaultValue={moment('12:08', format)}
+                  // defaultValue={moment('12:08', format)}
                   format={format}
                 />
               </Form.Item>
@@ -128,6 +129,21 @@ const DrawerForm = () => {
                 ]}
               >
                 <Input.TextArea rows={4} placeholder='Nhập mô tả' />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={6}>
+              <Form.Item
+                name='image'
+                label='Hình ảnh'
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Avatar />
               </Form.Item>
             </Col>
           </Row>
