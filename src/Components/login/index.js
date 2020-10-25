@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import React, { useRef, useContext, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import './login.style.css';
-import axios from './../../apis';
-import authContext, { AuthAction } from './../../contexts/auth/auth-context';
-import jwt from 'jsonwebtoken';
-import Spinner from '../spinner';
-import openNotification, { typeNotification } from './../notification';
-=======
 import React, { useRef, useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./login.style.css";
@@ -16,7 +6,6 @@ import authContext, { AuthAction } from "./../../contexts/auth/auth-context";
 import jwt from "jsonwebtoken";
 import Spinner from "../spinner";
 import openNotification, { typeNotification } from "./../notification";
->>>>>>> addseminar_button
 function LoginForm({ history }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,13 +33,8 @@ function LoginForm({ history }) {
         },
       });
       setError(null);
-<<<<<<< HEAD
-      history.push('/');
-      openNotification(typeNotification.success, 'You are logged in!');
-=======
       history.push("/");
       openNotification(typeNotification.success, "You are logged in!");
->>>>>>> addseminar_button
     } else {
       // openNotification(typeNotification.warning, data.message);
       setError(data.message);
