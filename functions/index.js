@@ -239,7 +239,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 //get all user to manage
+=======
+>>>>>>> addseminar_button
 app.get('/users', async (req, res) => {
   // if (!req.isAuth) {
   //   res.send(404, 'Unauthorization!');
