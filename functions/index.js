@@ -31,6 +31,7 @@ app.use((req, res, next) => {
     return next();
   }
   const token = authHeader.split(' ')[1]; //Bearer token => token
+
   if (!token || token === '') {
     req.isAuth = false;
     return next();
@@ -137,22 +138,26 @@ app.post('/createseminar', async (req, res) => {
   try {
     const {
       title,
+      imageUrl,
       description,
       quantity,
       authorName,
       location,
-      timeStart,
+      date,
+      time,
     } = req.body;
-    if (!title || !timeStart) {
-      res.send(404, 'title and time start are required!');
+    if (!title || !date) {
+      res.send(404, 'title and date are required!');
     }
     const newSeminar = {
+      image: imageUrl,
       title,
       description,
       quantity: quantity || 50,
       authorName,
       location,
-      timeStart,
+      date,
+      time,
       createdBy: req.userId,
       status: 'pending',
     };

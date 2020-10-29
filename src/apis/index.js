@@ -1,7 +1,6 @@
 import axios from 'axios';
 import queryString from 'query-string';
-const API_URL =
-  'https://us-central1-cloud-computing-5a696.cloudfunctions.net/api';
+const API_URL = 'http://localhost:5001/cloud-computing-5a696/us-central1/api';
 const axiosClient = axios.create({
   baseURL: API_URL,
   headers: {

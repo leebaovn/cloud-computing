@@ -27,19 +27,14 @@ export const SidebarMenu = [
   {
     name: 'Seminar Management',
     path: 'seminar-management',
-    roleAccess: ['user'],
-  },
-  {
-    name: 'User Management',
-    path: 'user-management',
     exact: true,
     roleAccess: ['admin'],
   },
   {
-    name: 'Seminar Management',
-    path: 'seminar-management',
+    name: 'Seminar Join',
+    path: 'seminarjoining',
     exact: true,
-    roleAccess: ['admin'],
+    roleAccess: ['audience'],
   },
 ];
 

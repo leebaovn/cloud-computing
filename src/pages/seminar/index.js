@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
-import { Card } from 'antd';
+import { Button, Card } from 'antd';
 import axiosClient from '../../apis';
 import DrawerForm from './../../Components/addSeminar';
-
+import authContext from './../../contexts/auth/auth-context';
+import './seminar.style.css';
 const { Meta } = Card;
 function SeminarPage() {
   const [seminars, setSeminars] = useState([]);
+  const [authState, authDispatch] = useContext(authContext);
+  const { role } = authState;
   useEffect(() => {
     const fetchSeminar = async () => {
       const seminars = await axiosClient.get('/seminars');
@@ -19,27 +22,23 @@ function SeminarPage() {
   }, []);
   return (
     <Layout>
-      <Toolbar title='Seminar'>
-        <DrawerForm />
-      </Toolbar>
+      <Toolbar title='Seminar'>{role !== 'audience' && <DrawerForm />}</Toolbar>
       <div className='contentWrapper'>
-        {/* <Card
-          hoverable
-          style={{ width: 240 }}
-          cover={
-            <img
-              alt='example'
-              src='https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png'
-            />
-          }
-        >
-          <Meta title='Europe Street beat' description='www.instagram.com' />
-        </Card> */}
         {seminars &&
           seminars?.map((seminar) => (
-            <p key={seminar.id}>
-              {seminar.title}-{seminar.quantity}
-            </p>
+            <Card
+              key={seminar.id}
+              hoverable
+              style={{ width: 240 }}
+              cover={<img alt='example' src={seminar.image} />}
+            >
+              <Meta title={seminar.title} description={seminar.description} />
+              <div className='seminar__info'>
+                <div>{`30/${seminar.quantity}`}</div>
+                {role !== 'audience' && <Button>{seminar.status}</Button>}
+                {role === 'audience' && <Button>Join</Button>}
+              </div>
+            </Card>
           ))}
       </div>
     </Layout>
