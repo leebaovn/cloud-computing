@@ -41,6 +41,8 @@ function LoginForm({ history }) {
     }
     setIsLoading(false);
   };
+  console.log(process.env.REACT_APP_CI, '33333333333');
+
   return (
     <>
       <div className='back-drop'></div>
