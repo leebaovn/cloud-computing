@@ -24,7 +24,7 @@ jobs:
       - name: build
         run: |
           npm install
-          yarn
+          npx browserslist --update-db
           npm run build
 
       # Runs a set of commands using the runners shell
