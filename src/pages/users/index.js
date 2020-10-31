@@ -30,9 +30,12 @@ const columnUser = [
     },
   },
   {
-    title: 'Action',
+    title: 'Number of seminar',
     dataIndex: '',
-    key: 'action',
+    key: 'join',
+    render: (_, record) => {
+      return <p>{record.join || 10}</p>;
+    },
   },
 ];
 

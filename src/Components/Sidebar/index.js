@@ -4,6 +4,7 @@ import './sidebar.style.css';
 import { LogoutOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import authContext, { AuthAction } from './../../contexts/auth/auth-context';
+
 export const SidebarMenu = [
   {
     name: 'My seminar',
@@ -28,6 +29,12 @@ export const SidebarMenu = [
     path: 'seminar-management',
     exact: true,
     roleAccess: ['admin'],
+  },
+  {
+    name: 'Seminar Join',
+    path: 'seminarjoining',
+    exact: true,
+    roleAccess: ['audience'],
   },
 ];
 
@@ -60,6 +67,7 @@ function Sidebar(props) {
           )}
         </ul>
       </div>
+
       <div className='logout'>
         <LogoutOutlined />
         <span onClick={logout}>Logout</span>
