@@ -266,3 +266,33 @@ app.get('/users', async (req, res) => {
   }
 });
 exports.api = functions.https.onRequest(app);
+
+//create new category
+app.post('/createcategory', async (req, res) => {
+  // if (!req.isAuth) {
+  //   res.send(404, 'Unauthorization!');
+  // }
+  // if (req.role === 'audience') {
+  //   res.send(404, 'You dont have permission to create category!');
+  // }
+  try {
+    const {
+      title,
+      description,
+    } = req.body;
+    if (!title || !description) {
+      res.send(404, 'title and description are required!');
+    }
+    const newCategory = {
+      title,
+      description,
+    };
+
+    const addedCategory = await db.collection('categories').add(newCategory);
+    res.json({ category: addedCategory.id });
+  } catch (err) {
+    throw err;
+  }
+});
+
+
