@@ -269,12 +269,12 @@ exports.api = functions.https.onRequest(app);
 
 //create new category
 app.post('/createcategory', async (req, res) => {
-  // if (!req.isAuth) {
-  //   res.send(404, 'Unauthorization!');
-  // }
-  // if (req.role === 'audience') {
-  //   res.send(404, 'You dont have permission to create category!');
-  // }
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization!');
+  }
+  if (req.role === 'audience') {
+    res.send(404, 'You dont have permission to create category!');
+  }
   try {
     const {
       title,
@@ -294,5 +294,87 @@ app.post('/createcategory', async (req, res) => {
     throw err;
   }
 });
+
+
+//get all categories
+app.get('/categories', async (req, res) => {
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization!');
+  }
+  if (req.role !== 'admin') {
+    res.send(404, 'You dont have permission');
+  }
+  const snapshot = await db.collection('categories').get();
+  if (!snapshot.empty) {
+    const categories = snapshot.docs.map((category) => {
+      return {
+        ...category.data(),
+        id: category.id,
+      };
+    });
+    res.json({ data: categories });
+  } else {
+    res.json({ message: 'Not found!' });
+  }
+});
+
+//update category
+app.put('/category/:id', async (req, res) => {
+  //   if (!req.isAuth) {
+  //   res.send(404, 'Unauthorization!');
+  // }
+  // if (req.role === 'audience') {
+  //   res.send(404, 'You dont have permission to create category!');
+  // }
+  try {
+    const {
+      title,
+      description,
+    } = req.body;
+
+    if (!title || !description) {
+      res.send(404, 'title and description are required!');
+    }
+
+    console.log(req.params.id);
+    const id = req.params.id;
+    console.log(id);
+
+    const categoryFound = await db
+    .collection('categories')
+    .where('id', '==', id)
+    .get();
+
+    if (categoryFound.empty) {
+      res.json({ message: 'Can not find that category!' });
+    }
+    else {
+      //res.json({ message: 'Succeed!' });
+
+      // categoryFound.title = req.body.title;
+      // categoryFound.description = req.body.description;
+
+      const updatedCategory = await db.collection('categories')
+      .doc(id)
+      .update({title: req.body.title, description: req.body.description});
+
+      // updatedCategory.update({title: req.body.title, description: req.body.description}).then(() => {
+      //   return res.json({ message: 'Updated' });
+      // })
+      // .catch(() => {
+      //   return res.json({ message: 'Update fail' });
+      // });
+    }
+  } catch (err) {
+    throw err;
+  }
+});
+
+
+
+
+
+
+
 
 
