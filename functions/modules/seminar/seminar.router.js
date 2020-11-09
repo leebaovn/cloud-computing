@@ -10,7 +10,7 @@ const {
 } = require('./seminar.controller');
 const { isAuth } = require('../../middlewares/auth.middleware');
 
-router.use(isAuth);
+// router.use(isAuth);
 
 router.get('/', getSeminars);
 router.get('/:id', getSeminarById);
