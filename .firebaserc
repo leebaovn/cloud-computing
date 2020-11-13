@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "cloud-computing-5a696"
+    "default": "cloud-computing-5a696",
+    "cloud-computing": "cloud-computing-5a696"
   }
 }

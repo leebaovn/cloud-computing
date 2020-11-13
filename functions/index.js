@@ -265,6 +265,12 @@ app.get('/users', async (req, res) => {
     res.json({ message: 'Not found!' });
   }
 });
+
+// const { createSeminar } = require('../functions/modules/seminar/seminar.controller');
+// app.put('/update-seminar/:id', deleteSeminar);
+// app.post('/create-seminar', createSeminar);
+const seminarRouter = require('./modules/seminar/seminar.router');
+app.use('/seminar', seminarRouter);
 exports.api = functions.https.onRequest(app);
 
 //create new category
