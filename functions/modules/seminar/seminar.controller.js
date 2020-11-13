@@ -98,6 +98,7 @@ exports.createSeminar = async (req, res, next) => {
       time,
       createdBy: req.userId,
       status: 'pending',
+      member: [],
     };
 
     const addedSeminar = await db.collection('seminars').add(newSeminar);
@@ -120,7 +121,7 @@ exports.updateSeminar = async (req, res, next) => {
 
     await db.runTransaction(async (transaction) => {
       const doc = await transaction.get(docRef);
-      
+
       if (!doc.exists) {
         throw new Error('error');
       }
@@ -146,7 +147,7 @@ exports.deleteSeminar = async (req, res, next) => {
 
     await db.runTransaction(async (transaction) => {
       const doc = await transaction.get(docRef);
-      
+
       if (!doc.exists) {
         throw new Error('error');
       }

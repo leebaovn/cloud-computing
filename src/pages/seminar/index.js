@@ -27,7 +27,7 @@ function SeminarPage() {
         {seminars &&
           seminars?.map((seminar) => (
             <Card
-              key={seminar.id}
+              key={seminar.authorName}
               hoverable
               style={{ width: 240 }}
               cover={<img alt='example' src={seminar.image} />}

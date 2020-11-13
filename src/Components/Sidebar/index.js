@@ -31,6 +31,12 @@ export const SidebarMenu = [
     roleAccess: ['admin'],
   },
   {
+    name: 'Category Management',
+    path: 'categories',
+    exact: true,
+    roleAccess: ['admin'],
+  },
+  {
     name: 'Seminar Join',
     path: 'seminarjoining',
     exact: true,

@@ -282,10 +282,7 @@ app.post('/createcategory', async (req, res) => {
     res.send(404, 'You dont have permission to create category!');
   }
   try {
-    const {
-      title,
-      description,
-    } = req.body;
+    const { title, description } = req.body;
     if (!title || !description) {
       res.send(404, 'title and description are required!');
     }
@@ -301,13 +298,12 @@ app.post('/createcategory', async (req, res) => {
   }
 });
 
-
 //get all categories
 app.get('/categories', async (req, res) => {
   if (!req.isAuth) {
     res.send(404, 'Unauthorization!');
   }
-  if (req.role !== 'admin') {
+  if (req.role === 'audience') {
     res.send(404, 'You dont have permission');
   }
   const snapshot = await db.collection('categories').get();
@@ -324,6 +320,20 @@ app.get('/categories', async (req, res) => {
   }
 });
 
+app.delete('/category/:id', async (req, res) => {
+  if (!req.isAuth) {
+    res.send(404, 'Unauthorization');
+  }
+  if (req.role !== 'admin') {
+    res.send(404, 'You dont have permission!');
+  }
+  try {
+    await db.collection('categories').doc(req.params.id).delete();
+  } catch (err) {
+    throw new Error('Can not delete!');
+  }
+});
+
 //update category
 app.put('/category/:id', async (req, res) => {
   //   if (!req.isAuth) {
@@ -333,10 +343,7 @@ app.put('/category/:id', async (req, res) => {
   //   res.send(404, 'You dont have permission to create category!');
   // }
   try {
-    const {
-      title,
-      description,
-    } = req.body;
+    const { title, description } = req.body;
 
     if (!title || !description) {
       res.send(404, 'title and description are required!');
@@ -347,22 +354,22 @@ app.put('/category/:id', async (req, res) => {
     console.log(id);
 
     const categoryFound = await db
-    .collection('categories')
-    .where('id', '==', id)
-    .get();
+      .collection('categories')
+      .where('id', '==', id)
+      .get();
 
     if (categoryFound.empty) {
       res.json({ message: 'Can not find that category!' });
-    }
-    else {
+    } else {
       //res.json({ message: 'Succeed!' });
 
       // categoryFound.title = req.body.title;
       // categoryFound.description = req.body.description;
 
-      const updatedCategory = await db.collection('categories')
-      .doc(id)
-      .update({title: req.body.title, description: req.body.description});
+      const updatedCategory = await db
+        .collection('categories')
+        .doc(id)
+        .update({ title: req.body.title, description: req.body.description });
 
       // updatedCategory.update({title: req.body.title, description: req.body.description}).then(() => {
       //   return res.json({ message: 'Updated' });
@@ -375,12 +382,3 @@ app.put('/category/:id', async (req, res) => {
     throw err;
   }
 });
-
-
-
-
-
-
-
-
-

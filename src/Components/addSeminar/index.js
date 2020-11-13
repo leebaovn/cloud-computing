@@ -7,19 +7,23 @@ import {
   Form,
   Input,
   Row,
+  Select,
   TimePicker,
 } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { storage } from './../../firebase/firebase';
 import axios from './../../apis';
 import openNotification, { typeNotification } from './../notification';
 
 const format = 'HH:mm';
 
+const { Option } = Select;
+
 const DrawerForm = () => {
   const [visible, setVisible] = useState(false);
   const [fileSelect, setFileSelect] = useState();
   const [imgUrl, setImgUrl] = useState('');
+  const [categories, setCategories] = useState([]);
   const showDrawer = () => {
     setVisible(true);
   };
@@ -27,6 +31,14 @@ const DrawerForm = () => {
   const onClose = () => {
     setVisible(false);
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const cateList = await axios.get('/categories');
+      setCategories(cateList.data);
+    };
+    fetchCategories();
+  }, []);
 
   const handleUpload = (e) => {
     if (e.target.files) {
@@ -88,13 +100,8 @@ const DrawerForm = () => {
         <Form layout='vertical' onFinish={onCreateSeminar}>
           <Row gutter={16}>
             <Col span={6}>
-              <Form.Item name='image' label='Hình ảnh'>
-                <input
-                  type='file'
-                  onChange={handleUpload}
-                  name='image'
-                  id='image'
-                />
+              <Form.Item label='Hình ảnh'>
+                <input type='file' onChange={handleUpload} />
                 {imgUrl && (
                   <img
                     src={imgUrl}
@@ -114,7 +121,7 @@ const DrawerForm = () => {
                 label='Tên diễn giả'
                 rules={[{ required: true, message: 'Nhập tên diễn giả' }]}
               >
-                <Input placeholder='Nhập tên diễn giả' id='name' name='name' />
+                <Input placeholder='Nhập tên diễn giả' id='name' />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -123,7 +130,7 @@ const DrawerForm = () => {
                 label='Tên seminar'
                 rules={[{ required: true, message: 'Nhập tên seminar' }]}
               >
-                <Input placeholder='Nhập tên seminar' id='title' name='title' />
+                <Input placeholder='Nhập tên seminar' id='title' />
               </Form.Item>
             </Col>
           </Row>
@@ -134,11 +141,7 @@ const DrawerForm = () => {
                 label='Địa điểm'
                 rules={[{ required: true, message: 'Nhập địa điểm' }]}
               >
-                <Input
-                  placeholder='Nhập địa điểm'
-                  id='location'
-                  name='location'
-                />
+                <Input placeholder='Nhập địa điểm' />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -147,11 +150,7 @@ const DrawerForm = () => {
                 label='Số lượng:'
                 rules={[{ required: true, message: 'Nhập số lượng' }]}
               >
-                <Input
-                  placeholder='Nhập số lượng'
-                  id='quantity'
-                  name='quantity'
-                />
+                <Input placeholder='Nhập số lượng' />
               </Form.Item>
             </Col>
           </Row>
@@ -162,7 +161,7 @@ const DrawerForm = () => {
                 label='Ngày seminar'
                 rules={[{ required: true, message: 'Nhập ngày seminar' }]}
               >
-                <DatePicker style={{ width: '100%' }} name='date' id='date' />
+                <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -175,9 +174,20 @@ const DrawerForm = () => {
                   style={{ width: '100%' }}
                   // defaultValue={moment('12:08', format)}
                   format={format}
-                  name='time'
-                  id='time'
                 />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item name='category' label='Danh mục'>
+                <Select>
+                  {categories?.map((cate) => (
+                    <Option key={cate.id} value={cate.id}>
+                      {cate.title}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
           </Row>
@@ -193,12 +203,7 @@ const DrawerForm = () => {
                   },
                 ]}
               >
-                <Input.TextArea
-                  rows={4}
-                  placeholder='Nhập mô tả'
-                  name='description'
-                  id='description'
-                />
+                <Input.TextArea rows={4} placeholder='Nhập mô tả' />
               </Form.Item>
             </Col>
           </Row>

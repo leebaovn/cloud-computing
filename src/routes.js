@@ -5,10 +5,10 @@ import Signup from './Components/login/signup';
 import Seminar from './pages/seminar';
 import Users from './pages/users';
 import authContext from './contexts/auth/auth-context';
-
+import Category from './pages/category';
 function PrivateRoute({ component: Component, ...rest }) {
   const [authState, _] = useContext(authContext);
-  const { token, role } = authState;
+  const { token } = authState;
   return (
     <Route
       {...rest}
@@ -27,6 +27,7 @@ function Routes() {
       <PrivateRoute path='/user-management' component={Users} />
 
       <PrivateRoute path='/seminar-management' component={Seminar} />
+      <PrivateRoute path='/categories' component={Category} />
 
       <PrivateRoute path='/' component={Seminar} />
     </Switch>
