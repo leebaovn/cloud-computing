@@ -24,12 +24,11 @@ jobs:
       - name: build
         run: |
           npm install
-          # npx browserslist --update-db
+          npx browserslist --update-db
           CI= npm run build
       # Runs a set of commands using the runners shell
       - name: firebase deploy
         run: |
           sudo npm install -g firebase-tools --unsafe-perm=true --allow-root
-          firebase login
           firebase use default
           firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
