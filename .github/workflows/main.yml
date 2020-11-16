@@ -24,6 +24,7 @@ jobs:
       - name: build
         run: |
           npm install
+          cd functions && npm install
           npx browserslist --update-db
           CI= npm run build
       # Runs a set of commands using the runners shell
