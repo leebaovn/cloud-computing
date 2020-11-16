@@ -20,6 +20,7 @@ exports.getSeminars = async (req, res, next) => {
       const mySeminars = snapshot.docs.map((seminar) => {
         return {
           ...seminar.data(),
+          id: seminar.id,
         };
       });
       res.json({ data: mySeminars });
@@ -44,6 +45,7 @@ exports.getSeminars = async (req, res, next) => {
       const seminars = snapshot.docs.map((seminar) => {
         return {
           ...seminar.data(),
+          id: seminar.id,
         };
       });
       res.json({ data: seminars });
@@ -59,7 +61,7 @@ exports.getSeminarById = async (req, res, next) => {
   }
   try {
     const doc = await db.collection('seminars').doc(req.params.id).get();
-    res.send({ data: doc.data() });
+    res.send({ data: { ...doc.data(), id: doc.id } });
   } catch (error) {
     () => next(error);
   }
@@ -98,7 +100,7 @@ exports.createSeminar = async (req, res, next) => {
       time,
       createdBy: req.userId,
       status: 'pending',
-      member: [],
+      members: [],
     };
 
     const addedSeminar = await db.collection('seminars').add(newSeminar);

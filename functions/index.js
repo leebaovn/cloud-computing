@@ -16,7 +16,7 @@ const app = express();
 app.use(cors({ origin: '*' }));
 
 const transporter = nodeMailer.createTransport({
-  service: 'Gmail',
+  service: 'gmail',
   host: 'gmail.com',
   auth: {
     user: process.env.MAIL_ADDRESS,
@@ -271,7 +271,6 @@ app.get('/users', async (req, res) => {
 // app.post('/create-seminar', createSeminar);
 const seminarRouter = require('./modules/seminar/seminar.router');
 app.use('/seminar', seminarRouter);
-exports.api = functions.https.onRequest(app);
 
 //create new category
 app.post('/createcategory', async (req, res) => {
@@ -328,14 +327,15 @@ app.delete('/category/:id', async (req, res) => {
     res.send(404, 'You dont have permission!');
   }
   try {
-    await db.collection('categories').doc(req.params.id).delete();
+    const data = await db.collection('categories').doc(req.params.id).delete();
+    return res.json({ message: 'deleted' });
   } catch (err) {
     throw new Error('Can not delete!');
   }
 });
 
 //update category
-app.put('/category/:id', async (req, res) => {
+app.patch('/category/:id', async (req, res) => {
   //   if (!req.isAuth) {
   //   res.send(404, 'Unauthorization!');
   // }
@@ -349,16 +349,11 @@ app.put('/category/:id', async (req, res) => {
       res.send(404, 'title and description are required!');
     }
 
-    console.log(req.params.id);
     const id = req.params.id;
-    console.log(id);
 
-    const categoryFound = await db
-      .collection('categories')
-      .where('id', '==', id)
-      .get();
+    const categoryFound = await db.collection('categories').doc(id).get();
 
-    if (categoryFound.empty) {
+    if (!categoryFound.data().title) {
       res.json({ message: 'Can not find that category!' });
     } else {
       //res.json({ message: 'Succeed!' });
@@ -366,13 +361,13 @@ app.put('/category/:id', async (req, res) => {
       // categoryFound.title = req.body.title;
       // categoryFound.description = req.body.description;
 
-      const updatedCategory = await db
-        .collection('categories')
-        .doc(id)
-        .update({ title: req.body.title, description: req.body.description });
+      await db.collection('categories').doc(id).update({
+        title,
+        description,
+      });
 
       // updatedCategory.update({title: req.body.title, description: req.body.description}).then(() => {
-      //   return res.json({ message: 'Updated' });
+      return res.json({ message: 'Updated' });
       // })
       // .catch(() => {
       //   return res.json({ message: 'Update fail' });
@@ -382,3 +377,5 @@ app.put('/category/:id', async (req, res) => {
     throw err;
   }
 });
+
+exports.api = functions.https.onRequest(app);

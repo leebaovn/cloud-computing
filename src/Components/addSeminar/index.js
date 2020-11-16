@@ -19,10 +19,11 @@ const format = 'HH:mm';
 
 const { Option } = Select;
 
-const DrawerForm = () => {
+const DrawerForm = ({ fetchSeminar }) => {
   const [visible, setVisible] = useState(false);
   const [fileSelect, setFileSelect] = useState();
   const [imgUrl, setImgUrl] = useState('');
+  const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const showDrawer = () => {
     setVisible(true);
@@ -78,9 +79,10 @@ const DrawerForm = () => {
         time: new Date(e.time._d).toLocaleDateString(),
       });
       onClose();
+      fetchSeminar();
+      form.resetFields();
       openNotification(typeNotification.success, 'Seminar created!');
     } catch (err) {
-      console.log(err);
       openNotification(typeNotification.error, 'Something went wrong!');
     }
   };
@@ -97,7 +99,7 @@ const DrawerForm = () => {
         visible={visible}
         bodyStyle={{ paddingBottom: 50 }}
       >
-        <Form layout='vertical' onFinish={onCreateSeminar}>
+        <Form layout='vertical' onFinish={onCreateSeminar} form={form}>
           <Row gutter={16}>
             <Col span={6}>
               <Form.Item label='Hình ảnh'>
