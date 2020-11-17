@@ -9,10 +9,14 @@ class Error {
     this.level = 'error';
   }
 
-  addField = (key, value) => {
-    _.set('this.' + key, value);
+  addField(key, value) {
+    this[key] = value;
     return this;
-  };
+  }
+
+  getCode() {
+    return this.statusCode;
+  }
 }
 
-module.exports = Error;
+module.exports = { Error };
