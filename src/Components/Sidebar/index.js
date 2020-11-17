@@ -31,6 +31,12 @@ export const SidebarMenu = [
     roleAccess: ['admin'],
   },
   {
+    name: 'Category Management',
+    path: 'categories',
+    exact: true,
+    roleAccess: ['admin'],
+  },
+  {
     name: 'Seminar Join',
     path: 'seminarjoining',
     exact: true,
@@ -61,7 +67,16 @@ function Sidebar(props) {
           {SidebarMenu.filter((item) => item.roleAccess.indexOf(role) >= 0).map(
             (item, index) => (
               <li key={index} className='sidebar__item'>
-                <NavLink to={item.path}>{item.name}</NavLink>
+                <NavLink
+                  to={item.path}
+                  activeStyle={{
+                    color: 'blue',
+                    fontSize: '2rem',
+                    transition: 'all 0.3s',
+                  }}
+                >
+                  {item.name}
+                </NavLink>
               </li>
             )
           )}

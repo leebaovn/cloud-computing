@@ -23,6 +23,7 @@ exports.getSeminars = async (req, res, next) => {
       const mySeminars = snapshot.docs.map((seminar) => {
         return {
           ...seminar.data(),
+          id: seminar.id,
         };
       });
       // res.json({ data: mySeminars });
@@ -51,6 +52,7 @@ exports.getSeminars = async (req, res, next) => {
       const seminars = snapshot.docs.map((seminar) => {
         return {
           ...seminar.data(),
+          id: seminar.id,
         };
       });
       // res.json({ data: seminars });
@@ -70,7 +72,7 @@ exports.getSeminarById = async (req, res, next) => {
   try {
     const doc = await db.collection('seminars').doc(req.params.id).get();
     // res.send({ data: doc.data() });
-    const success = new Success({ data: doc.data() });
+    const success = new Success({ data: doc.data(), id: doc.id });
     res.status(200).send(success);
   } catch (error) {
     () => next(error);
@@ -119,11 +121,12 @@ exports.createSeminar = async (req, res, next) => {
       time,
       createdBy: req.userId,
       status: 'pending',
+      members: [],
     };
 
     const addedSeminar = await db.collection('seminars').add(newSeminar);
     // res.json({ data: addedSeminar.data() });
-    const success = new Success({ data: addedSeminar.data() });
+    const success = new Success({ data: addedSeminar.data(), id: addedSeminar.id });
     res.status(200).send(success);
   } catch (error) {
     () => next(error);
@@ -171,7 +174,7 @@ exports.updateSeminar = async (req, res, next) => {
     });
     const updatedDoc = await docRef.get();
     // res.json({ data: updatedDoc.data() });
-    const success = new Success({ data: updatedDoc.data() });
+    const success = new Success({ data: updatedDoc.data(), id: updatedDoc.id });
     res.status(200).send(success);
   } catch (error) {
     () => next(error);

@@ -21,7 +21,8 @@ const columnUser = [
     dataIndex: 'role',
     key: 'role',
     render: (role) => {
-      let color = role === 'admin' ? 'red' : 'geekblue';
+      let color =
+        role === 'admin' ? 'red' : role === 'speaker' ? 'green' : 'geekblue';
       return (
         <Tag color={color} key={role}>
           {role.toUpperCase()}
