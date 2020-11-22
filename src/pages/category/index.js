@@ -1,6 +1,5 @@
 import { Input, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
-import Spinner from '../../Components/spinner';
 import Layout from './../../Components/Layout';
 import Toolbar from './../../Components/Toolbar';
 import './../seminar/seminar.style.css';
@@ -27,10 +26,10 @@ function CategoryPage() {
     try {
       await axios.delete(`/category/${id}`);
       fetchCategories();
-      openNotification(typeNotification.success, 'deleted');
+      openNotification(typeNotification.success, 'Xóa danh mục thành công!');
       setLoadding(false);
     } catch (err) {
-      openNotification(typeNotification.error, 'Error occurs');
+      openNotification(typeNotification.error, 'Đã có lỗi xảy ra!');
       setLoadding(false);
     }
   };
@@ -41,17 +40,17 @@ function CategoryPage() {
       key: 'order',
     },
     {
-      title: 'Title',
+      title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'id',
     },
     {
-      title: 'Desciption',
+      title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Action',
+      title: '',
       key: 'action',
       render: (item, record) => {
         return (
@@ -119,7 +118,7 @@ function CategoryPage() {
           title,
           description,
         });
-        openNotification(typeNotification.success, 'created');
+        openNotification(typeNotification.success, 'Tạo danh mục thành công!');
         fetchCategories();
         setLoadding(false);
         setVisible(false);
@@ -129,7 +128,10 @@ function CategoryPage() {
           title,
           description,
         });
-        openNotification(typeNotification.success, 'updated');
+        openNotification(
+          typeNotification.success,
+          'Chỉnh sửa danh mục thành công!'
+        );
         fetchCategories();
         setLoadding(false);
         setVisible(false);
@@ -137,7 +139,7 @@ function CategoryPage() {
         setCategoryChosen(null);
       }
     } catch (err) {
-      openNotification(typeNotification.success, 'error occurs');
+      openNotification(typeNotification.success, 'Đã có lỗi xảy ra!');
       setLoadding(false);
     }
   };
@@ -154,14 +156,14 @@ function CategoryPage() {
           <Form onFinish={handleSubmit} form={form}>
             <Form.Item
               name='title'
-              label='title'
+              label='Tiêu đề'
               rules={[{ type: 'required', message: 'Nhập tên danh mục' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name='description'
-              label='description'
+              label='Mô tả'
               rules={[{ type: 'required', message: 'Nhập mô tả' }]}
             >
               <Input />
@@ -174,7 +176,14 @@ function CategoryPage() {
                 justifyContent: 'flex-end',
               }}
             >
-              <Button key='close' onClick={() => setVisible(false)}>
+              <Button
+                key='close'
+                onClick={() => {
+                  setCategoryChosen(null);
+                  form.resetFields();
+                  setVisible(false);
+                }}
+              >
                 Hủy
               </Button>
               <Button

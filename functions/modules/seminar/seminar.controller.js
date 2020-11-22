@@ -112,10 +112,10 @@ exports.createSeminar = async (req, res, next) => {
 
 exports.updateSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorized!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    res.send(404, 'You don not have permission to update seminar!');
+    res.send(404, 'Bạn không được phép!');
   }
 
   try {
@@ -138,10 +138,10 @@ exports.updateSeminar = async (req, res, next) => {
 
 exports.deleteSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorized!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    res.send(404, 'You don not have permission to delete seminar!');
+    res.send(404, 'Bạn không được phép!');
   }
 
   try {
@@ -155,7 +155,7 @@ exports.deleteSeminar = async (req, res, next) => {
       }
       transaction.delete(docRef);
     });
-    res.send(200, 'Deleted successfully');
+    res.send(200, 'Xóa seminar thành công!');
   } catch (error) {
     () => next(error);
   }

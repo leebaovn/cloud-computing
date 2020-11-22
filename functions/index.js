@@ -58,33 +58,33 @@ app.use((req, res, next) => {
 //Send mail to speaker as if their seminar is accepted or not
 app.post('/seminarpermission', async (req, res) => {
   if (req.role !== 'admin') {
-    return res.json({ message: 'You dont have permission on this action!' });
+    return res.json({ message: 'Bạn không được phép!' });
   }
   try {
     const { seminarId, status, authorId } = req.body; // get event to update status, get authorId to send mail confirm
     const authorData = await db.collection('users').doc(authorId).get();
     if (!authorData.data().email) {
-      return res.json({ message: 'Author not found!' });
+      return res.json({ message: 'Không tìm thấy tác giả!' });
     } else {
       const authorEmail = authorData.data().email;
       const mailOptions = {
         from: process.env.MAIL_ADDRESS,
         to: authorEmail,
         subject: 'Confirm seminar',
-        html: `<p>Your seminar was ${status}</p>`,
+        html: `<p>Your seminar was <b>${status}<b></p>`,
       };
       return transporter.sendMail(mailOptions, async (err, info) => {
         if (err) {
-          return res.json({ message: `Cannot send mail ${err}` });
+          return res.json({ message: `Không thể gửi email ${err}` });
         }
         const eventFound = db.collection('seminars').doc(seminarId);
         eventFound
           .update({ status: status })
           .then(() => {
-            return res.json({ data: 'Email sent' });
+            return res.json({ data: 'Gửi email xác nhận thành công!' });
           })
           .catch(() => {
-            return res.json({ message: 'Seminar not found' });
+            return res.json({ message: 'Không tìm thấy seminar!' });
           });
       });
     }
@@ -98,7 +98,7 @@ app.post('/createuser', async (req, res) => {
   try {
     const { email, password, name, role, studentId } = req.body;
     if (!email || !password || !name) {
-      return res.json({ message: 'You are missing some field' });
+      return res.json({ message: 'Vui lòng nhập thêm thông tin!' });
     }
     const userFound = await db
       .collection('users')
@@ -106,7 +106,7 @@ app.post('/createuser', async (req, res) => {
       .get();
     if (!userFound.empty) {
       return res.json({
-        message: 'Email is exist. Please choose another email.',
+        message: 'Email này đã tồn tại. Vui lòng chọn email khác!',
       });
     }
     const newUser = {
@@ -122,17 +122,17 @@ app.post('/createuser', async (req, res) => {
     res.json({ result: `user with ID: ${addedUser.id} added.` }); //message return when create new User
   } catch (err) {
     // throw err;
-    res.json({ hello: 'fail roi' });
+    res.json({ message: 'Lỗi bất ngờ xảy ra!' });
   }
 });
 
 //create new seminar
 app.post('/createseminar', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    res.send(404, 'You dont have permission to create seminar!');
+    res.send(404, 'Bạn không được phép!');
   }
 
   try {
@@ -147,7 +147,7 @@ app.post('/createseminar', async (req, res) => {
       time,
     } = req.body;
     if (!title || !date) {
-      res.send(404, 'title and date are required!');
+      res.send(404, 'Vui lòng nhập thông tin cần thiết!');
     }
     const newSeminar = {
       image: imageUrl,
@@ -172,7 +172,7 @@ app.post('/createseminar', async (req, res) => {
 //Get seminar
 app.get('/seminars', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
 
   try {
@@ -210,7 +210,7 @@ app.post('/login', async (req, res) => {
       .where('email', '==', email)
       .get();
     if (userFound.empty) {
-      res.json({ message: 'Email or password is incorrect!' });
+      res.json({ message: 'Email hoặc mật khẩu không chính xác!' });
     }
     let ok = false;
     let user;
@@ -237,7 +237,7 @@ app.post('/login', async (req, res) => {
 
       res.json({ token });
     } else {
-      res.json({ message: 'Email or password is incorrect!' });
+      res.json({ message: 'Email hoặc mật khẩu không chính xác!' });
     }
   } catch (err) {
     throw err;
@@ -247,10 +247,10 @@ app.post('/login', async (req, res) => {
 //get all user to manage
 app.get('/users', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role !== 'admin') {
-    res.send(404, 'You dont have permission');
+    res.send(404, 'Bạn không được phép!');
   }
   const snapshot = await db.collection('users').get();
   if (!snapshot.empty) {
@@ -262,7 +262,7 @@ app.get('/users', async (req, res) => {
     });
     res.json({ data: users });
   } else {
-    res.json({ message: 'Not found!' });
+    res.json({ message: 'Không có người dùng nào!' });
   }
 });
 
@@ -275,15 +275,15 @@ app.use('/seminar', seminarRouter);
 //create new category
 app.post('/createcategory', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    res.send(404, 'You dont have permission to create category!');
+    res.send(404, 'Bạn không được phép!');
   }
   try {
     const { title, description } = req.body;
     if (!title || !description) {
-      res.send(404, 'title and description are required!');
+      res.send(404, 'Vui lòng nhập thông tin!');
     }
     const newCategory = {
       title,
@@ -300,11 +300,11 @@ app.post('/createcategory', async (req, res) => {
 //get all categories
 app.get('/categories', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization!');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
-  if (req.role === 'audience') {
-    res.send(404, 'You dont have permission');
-  }
+  // if (req.role === 'audience') {
+  //   res.send(404, 'You dont have permission');
+  // }
   const snapshot = await db.collection('categories').get();
   if (!snapshot.empty) {
     const categories = snapshot.docs.map((category) => {
@@ -315,22 +315,22 @@ app.get('/categories', async (req, res) => {
     });
     res.json({ data: categories });
   } else {
-    res.json({ message: 'Not found!' });
+    res.json({ message: 'Không có danh mục nào!' });
   }
 });
 
 app.delete('/category/:id', async (req, res) => {
   if (!req.isAuth) {
-    res.send(404, 'Unauthorization');
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role !== 'admin') {
-    res.send(404, 'You dont have permission!');
+    res.send(404, 'Bạn không được phép!');
   }
   try {
     const data = await db.collection('categories').doc(req.params.id).delete();
     return res.json({ message: 'deleted' });
   } catch (err) {
-    throw new Error('Can not delete!');
+    throw new Error('Không thể xóa danh mục này!');
   }
 });
 
@@ -346,7 +346,7 @@ app.patch('/category/:id', async (req, res) => {
     const { title, description } = req.body;
 
     if (!title || !description) {
-      res.send(404, 'title and description are required!');
+      res.send(404, 'Vui lòng nhập thông tin!');
     }
 
     const id = req.params.id;
@@ -354,7 +354,7 @@ app.patch('/category/:id', async (req, res) => {
     const categoryFound = await db.collection('categories').doc(id).get();
 
     if (!categoryFound.data().title) {
-      res.json({ message: 'Can not find that category!' });
+      res.json({ message: 'Không tìm thấy danh mục!' });
     } else {
       //res.json({ message: 'Succeed!' });
 
@@ -367,7 +367,7 @@ app.patch('/category/:id', async (req, res) => {
       });
 
       // updatedCategory.update({title: req.body.title, description: req.body.description}).then(() => {
-      return res.json({ message: 'Updated' });
+      return res.json({ message: 'Chỉnh sửa danh mục thành công!' });
       // })
       // .catch(() => {
       //   return res.json({ message: 'Update fail' });
