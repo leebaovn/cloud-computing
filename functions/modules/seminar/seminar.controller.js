@@ -330,8 +330,11 @@ exports.cancelSeminar = async (req, res, next) => {
       const { seminars } = user.data();
       const newMembers = members.filter((item) => item !== userId);
       const newSeminars = seminars.filter((item) => item !== id);
-      transaction.update(seminarRef, { ...seminar.data(), newMembers });
-      transaction.update(userRef, { ...user.data(), newSeminars });
+      transaction.update(seminarRef, {
+        ...seminar.data(),
+        members: newMembers,
+      });
+      transaction.update(userRef, { ...user.data(), seminars: newSeminars });
     });
     const success = new Success();
     res.status(200).send(success);
