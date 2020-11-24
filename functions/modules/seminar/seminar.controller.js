@@ -1,4 +1,3 @@
-const { default: Item } = require('antd/lib/list/Item');
 const admin = require('firebase-admin');
 const db = admin.firestore();
 const { Error } = require('../../utils/Error');
