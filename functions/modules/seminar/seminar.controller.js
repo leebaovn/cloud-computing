@@ -284,16 +284,15 @@ exports.joinSeminar = async (req, res, next) => {
     await db.runTransaction(async (transaction) => {
       const seminar = await transaction.get(seminarRef);
       if (!seminar.exists) {
-        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+        throw new Error({
+          statusCode: 404,
+          message: 'seminar not found',
+          error: 'seminar.notFound',
+        });
       }
       const user = await transaction.get(userRef);
-      const {
-        members,
-        quantity
-      } = seminar.data();
-      const {
-        seminars
-      } = user.data();
+      const { members, quantity } = seminar.data();
+      const { seminars } = user.data();
       if (members.length < quantity) {
         members.push(userId);
         seminars.push(id);
@@ -303,10 +302,10 @@ exports.joinSeminar = async (req, res, next) => {
     });
     const success = new Success();
     res.status(200).send(success);
-  } catch(error) {
+  } catch (error) {
     () => next(error);
   }
-}
+};
 
 exports.cancelSeminar = async (req, res, next) => {
   if (!req.isAuth) {
@@ -320,23 +319,23 @@ exports.cancelSeminar = async (req, res, next) => {
     await db.runTransaction(async (transaction) => {
       const seminar = await transaction.get(seminarRef);
       if (!seminar.exists) {
-        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+        throw new Error({
+          statusCode: 404,
+          message: 'seminar not found',
+          error: 'seminar.notFound',
+        });
       }
       const user = await transaction.get(userRef);
-      const {
-        members
-      } = seminar.data();
-      const {
-        seminars
-      } = user.data();
-      const newMembers = members.filter(item => item !== userId);
-      const newSeminars = seminars.filter(item => item !== id);
+      const { members } = seminar.data();
+      const { seminars } = user.data();
+      const newMembers = members.filter((item) => item !== userId);
+      const newSeminars = seminars.filter((item) => item !== id);
       transaction.update(seminarRef, { ...seminar.data(), newMembers });
       transaction.update(userRef, { ...user.data(), newSeminars });
     });
     const success = new Success();
     res.status(200).send(success);
-  } catch(error) {
+  } catch (error) {
     () => next(error);
   }
-}
+};

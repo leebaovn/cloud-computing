@@ -3,11 +3,10 @@ import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
 import axios from './../../apis';
 import { Table, Tag } from 'antd';
-import Spinner from '../../Components/spinner';
 
 const columnUser = [
   {
-    title: 'Full Name',
+    title: 'Họ và tên',
     dataIndex: 'name',
     key: 'name',
   },
@@ -17,7 +16,7 @@ const columnUser = [
     key: 'email',
   },
   {
-    title: 'Role',
+    title: 'Vai trò',
     dataIndex: 'role',
     key: 'role',
     render: (role) => {
@@ -31,7 +30,7 @@ const columnUser = [
     },
   },
   {
-    title: 'Number of seminar',
+    title: 'Số seminar tham gia',
     dataIndex: '',
     key: 'join',
     render: (_, record) => {
@@ -54,7 +53,6 @@ function SeminarPage() {
     };
     fetchUser();
   }, []);
-  console.log(users);
   return (
     <Layout>
       <Toolbar title='Users'></Toolbar>
@@ -63,10 +61,7 @@ function SeminarPage() {
           columns={columnUser}
           dataSource={users}
           pagination={false}
-          loading={{
-            spinning: loading,
-            indicator: <Spinner />,
-          }}
+          loading={loading}
         />
       </div>
     </Layout>

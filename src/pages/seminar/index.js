@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
-import { Button, Card, Modal } from 'antd';
+import { Button, Card, Modal, Select } from 'antd';
 import axiosClient from '../../apis';
 import DrawerForm from './../../Components/addSeminar';
 import authContext from './../../contexts/auth/auth-context';
@@ -10,14 +10,44 @@ import openNotification, {
   typeNotification,
 } from './../../Components/notification';
 const { Meta } = Card;
+const { Option } = Select;
+
+function translateStatus(status) {
+  switch (status) {
+    case 'accepted':
+      return 'Chấp thuận';
+    case 'pending':
+      return 'Chờ đợi';
+    case 'denied':
+      return 'Đã hủy';
+    default:
+      return '';
+  }
+}
 
 function SeminarPage() {
   const [seminars, setSeminars] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [authState, authDispatch] = useContext(authContext);
   const { role } = authState;
   const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
   const [currentSeminar, setCurrentSeminar] = useState(null);
+
+  const fetchCategories = async () => {
+    setLoadding(true);
+    const cateList = await axiosClient.get('/categories');
+    setCategories(
+      cateList.data.map((item, index) => {
+        return {
+          ...item,
+          index: index + 1,
+        };
+      })
+    );
+    setLoadding(false);
+  };
   const fetchSeminar = async () => {
     const seminars = await axiosClient.get('/seminar');
     if (!seminars.empty) {
@@ -26,6 +56,7 @@ function SeminarPage() {
   };
   useEffect(() => {
     fetchSeminar();
+    fetchCategories();
   }, []);
 
   const handleDecision = async (status) => {
@@ -36,15 +67,17 @@ function SeminarPage() {
         seminarId: currentSeminar.id,
         authorId: currentSeminar.createdBy,
       });
-      openNotification(typeNotification.success, 'Operation succesfully!');
+      openNotification(typeNotification.success, 'Đã thực hiện thành công!');
       fetchSeminar();
       setVisible(false);
       setCurrentSeminar(null);
     } catch (err) {
-      openNotification(typeNotification.error, 'error occurs');
+      openNotification(typeNotification.error, 'Đã có lỗi xảy ra!');
     }
     setLoadding(false);
   };
+
+  const handleChangeCategory = (cateId) => {};
 
   return (
     <Layout>
@@ -80,6 +113,15 @@ function SeminarPage() {
         <h3>Bạn muốn chấp nhận hay hủy buổi seminar này?</h3>
       </Modal>
       <Toolbar title='Seminar'>
+        <Select
+          style={{ width: 200 }}
+          placeholder='Chọn danh mục'
+          onChange={handleChangeCategory}
+        >
+          {categories?.map((cate) => (
+            <Option key={cate.id}>{cate.title}</Option>
+          ))}
+        </Select>
         {role !== 'audience' && <DrawerForm fetchSeminar={fetchSeminar} />}
       </Toolbar>
       <div className='contentWrapper'>
@@ -118,10 +160,10 @@ function SeminarPage() {
                         }
                       }}
                     >
-                      {seminar.status}
+                      {translateStatus(seminar.status)}
                     </Button>
                   )}
-                  {role === 'audience' && <Button>Join</Button>}
+                  {role === 'audience' && <Button>Tham gia</Button>}
                 </div>
               </Card>
             ))}

@@ -21,7 +21,6 @@ function LoginForm({ history }) {
       password: pwdRef.current.value,
     });
     if (data && !data.message) {
-      console.log(data, 'qqq');
       const { token } = data;
       const tokenDecode = jwt.decode(token);
       authDispatch({
@@ -34,28 +33,30 @@ function LoginForm({ history }) {
       });
       setError(null);
       history.push('/');
-      openNotification(typeNotification.success, 'You are logged in!');
+      openNotification(
+        typeNotification.success,
+        'Bạn đã đăng nhập thành công!'
+      );
     } else {
       // openNotification(typeNotification.warning, data.message);
       setError(data.message);
     }
     setIsLoading(false);
   };
-  console.log(process.env.REACT_APP_CI, '33333333333');
 
   return (
     <>
       <div className='back-drop'></div>
       <div className='login-form'>
         <form onSubmit={handleSubmit}>
-          <h1>LOGIN</h1>
+          <h1>ĐĂNG NHẬP</h1>
           {error && <div className='errorMessage'>{error}</div>}
           <input type='email' placeholder='Email' ref={emailRef} />
-          <input type='password' placeholder='Password' ref={pwdRef} />
-          {isLoading ? <Spinner /> : <input type='submit' value='Login' />}
+          <input type='password' placeholder='Mật khẩu' ref={pwdRef} />
+          {isLoading ? <Spinner /> : <input type='submit' value='Đăng nhập' />}
         </form>
         <p>
-          Dont have an account? <NavLink to='/sign-up'>Sign up now</NavLink>
+          Bạn chưa có tài khoản? <NavLink to='/sign-up'>Đăng ký ngay!</NavLink>
         </p>
       </div>
     </>

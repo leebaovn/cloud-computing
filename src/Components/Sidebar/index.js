@@ -19,19 +19,19 @@ export const SidebarMenu = [
     roleAccess: ['audience'],
   },
   {
-    name: 'User Management',
+    name: 'Users',
     path: 'user-management',
     exact: true,
     roleAccess: ['admin'],
   },
   {
-    name: 'Seminar Management',
+    name: 'Seminars',
     path: 'seminar-management',
     exact: true,
     roleAccess: ['admin'],
   },
   {
-    name: 'Category Management',
+    name: 'Category',
     path: 'categories',
     exact: true,
     roleAccess: ['admin'],
@@ -40,7 +40,7 @@ export const SidebarMenu = [
     name: 'Seminar Join',
     path: 'seminarjoining',
     exact: true,
-    roleAccess: ['audience'],
+    roleAccess: ['anudience'],
   },
 ];
 
@@ -85,7 +85,7 @@ function Sidebar(props) {
 
       <div className='logout'>
         <LogoutOutlined />
-        <span onClick={logout}>Logout</span>
+        <span onClick={logout}>Đăng xuất</span>
       </div>
     </div>
   );
