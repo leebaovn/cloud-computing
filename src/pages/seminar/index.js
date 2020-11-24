@@ -178,6 +178,11 @@ function SeminarPage() {
                   {role === 'audience' && (
                     <Button
                       loading={loading}
+                      type={
+                        seminar?.members?.includes(userId)
+                          ? 'default'
+                          : 'primary'
+                      }
                       onClick={() => handleJoinSeminar(seminar)}
                     >
                       {seminar?.members?.includes(userId) ? 'Hủy' : 'Tham gia'}
