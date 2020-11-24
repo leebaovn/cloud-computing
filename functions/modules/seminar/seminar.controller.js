@@ -141,12 +141,10 @@ exports.createSeminar = async (req, res, next) => {
 
 exports.updateSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    // res.send(404, 'Unauthorized!');
-    throw new Error({ statusCode: 404, message: 'Unauthorized' });
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    // res.send(404, 'You do not have permission to update seminar!');
-    throw new Error({ statusCode: 404, message: 'Do not have permission' });
+    res.send(404, 'Bạn không được phép!');
   }
 
   try {
@@ -178,7 +176,7 @@ exports.updateSeminar = async (req, res, next) => {
         time,
         category_id,
       };
-      transaction.update(docRef, data);
+      await transaction.update(docRef, data);
     });
     const updatedDoc = await docRef.get();
     // res.json({ data: updatedDoc.data() });
@@ -191,12 +189,10 @@ exports.updateSeminar = async (req, res, next) => {
 
 exports.deleteSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    // res.send(404, 'Unauthorized!');
-    throw new Error({ statusCode: 404, message: 'Unauthorized' });
+    res.send(404, 'Vui lòng đăng nhập!');
   }
   if (req.role === 'audience') {
-    // res.send(404, 'You do not have permission to delete seminar!');
-    throw new Error({ statusCode: 404, message: 'Do not have permission' });
+    res.send(404, 'Bạn không được phép!');
   }
 
   try {
@@ -208,11 +204,9 @@ exports.deleteSeminar = async (req, res, next) => {
       if (!doc.exists) {
         throw new Error({ statusCode: 400, message: 'Seminar not found' });
       }
-      transaction.delete(docRef);
+      await transaction.delete(docRef);
     });
-    // res.send(200, 'Deleted successfully');
-    const success = new Success();
-    res.status(200).send(success);
+    res.send(200, 'Xóa seminar thành công!');
   } catch (error) {
     () => next(error);
   }
@@ -288,20 +282,20 @@ exports.joinSeminar = async (req, res, next) => {
       }
       const user = await transaction.get(userRef);
       const {
-        members,
+        members = [],
         quantity
       } = seminar.data();
       const {
-        seminars
+        seminars = []
       } = user.data();
       if (members.length < quantity) {
         members.push(userId);
         seminars.push(id);
       }
-      transaction.update(seminarRef, { ...seminar.data(), members });
-      transaction.update(userRef, { ...user.data(), seminars });
+      await transaction.update(seminarRef, { ...seminar.data(), members });
+      await transaction.update(userRef, { ...user.data(), seminars });
     });
-    const success = new Success();
+    const success = new Success({});
     res.status(200).send(success);
   } catch(error) {
     () => next(error);
@@ -331,10 +325,10 @@ exports.cancelSeminar = async (req, res, next) => {
       } = user.data();
       const newMembers = members.filter(item => item !== userId);
       const newSeminars = seminars.filter(item => item !== id);
-      transaction.update(seminarRef, { ...seminar.data(), newMembers });
-      transaction.update(userRef, { ...user.data(), newSeminars });
+      await transaction.update(seminarRef, { ...seminar.data(), members: newMembers });
+      await transaction.update(userRef, { ...user.data(), seminars: newSeminars });
     });
-    const success = new Success();
+    const success = new Success({});
     res.status(200).send(success);
   } catch(error) {
     () => next(error);

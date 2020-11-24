@@ -10,10 +10,10 @@ const openNotification = (type, description) => {
   notification[type]({
     message:
       type === typeNotification.success
-        ? 'Success'
+        ? 'Thành công'
         : type === typeNotification.warning
-        ? 'Warning'
-        : 'Error',
+        ? 'Cảnh báo'
+        : 'Lỗi',
     description,
     placement: 'topRight',
   });

@@ -24,7 +24,10 @@ function Signup({ history }) {
       role: role,
     });
     if (data && !data.message) {
-      openNotification(typeNotification.success, 'Sign up successfully!');
+      openNotification(
+        typeNotification.success,
+        'Đăng ký tài khoản thành công!'
+      );
       setTimeout(() => {
         history.push('/login');
       }, 500);
@@ -42,31 +45,31 @@ function Signup({ history }) {
           {error && <div className='errorMessage'>{error}</div>}
 
           <input type='email' placeholder='Email' ref={emailRef} />
-          <input type='password' placeholder='Password' ref={pwdRef} />
-          <input type='text' placeholder='Full name' ref={nameRef} />
-          <input type='text' placeholder='Student ID' ref={studentIdRef} />
+          <input type='password' placeholder='Mật khẩu' ref={pwdRef} />
+          <input type='text' placeholder='Họ và tên' ref={nameRef} />
+          <input type='text' placeholder='Mã số sinh viên' ref={studentIdRef} />
           <label htmlFor=''>Bạn muốn là </label>
           <input
             type='radio'
             name='role'
-            value='speaker'
+            value='Diễn giả'
             id='speaker'
             onChange={(e) => setRole(e.target.value)}
           />
-          <label htmlFor='speaker'>Speaker</label>
+          <label htmlFor='speaker'>Diễn giả</label>
           <input
             type='radio'
             name='role'
-            value='audience'
+            value='Khán giả'
             checked
             onChange={(e) => setRole(e.target.value)}
             id='audience'
           />
-          <label htmlFor='audience'>Audience</label>
-          {loading ? <Spinner /> : <input type='submit' value='Sign up' />}
+          <label htmlFor='audience'>Khán giả</label>
+          {loading ? <Spinner /> : <input type='submit' value='Đăng ký' />}
         </form>
         <p>
-          Already have an account? <NavLink to='/login'>Log in now</NavLink>
+          Đã có tài khoản? <NavLink to='/login'>Đăng nhập ngay</NavLink>
         </p>
       </div>
     </>

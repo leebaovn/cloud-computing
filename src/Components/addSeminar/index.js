@@ -76,14 +76,18 @@ const DrawerForm = ({ fetchSeminar }) => {
         authorName: e.name,
         location: e.location,
         date: new Date(e.date._d).toLocaleDateString(),
-        time: new Date(e.time._d).toLocaleDateString(),
+        time: new Date(e.time._d).toLocaleTimeString(),
+        category_id: e.category,
       });
       onClose();
       fetchSeminar();
       form.resetFields();
-      openNotification(typeNotification.success, 'Seminar created!');
+      openNotification(
+        typeNotification.success,
+        'Seminar đã được tạo thành công!'
+      );
     } catch (err) {
-      openNotification(typeNotification.error, 'Something went wrong!');
+      openNotification(typeNotification.error, 'Đã có lỗi xảy ra!');
     }
   };
   return (
@@ -217,10 +221,10 @@ const DrawerForm = ({ fetchSeminar }) => {
                   onClick={onClose}
                   style={{ marginRight: 8 }}
                 >
-                  Cancel
+                  Hủy bỏ
                 </Button>
                 <Button type='primary' htmlType='submit'>
-                  Create
+                  Tạo
                 </Button>
               </Form.Item>
             </Col>
