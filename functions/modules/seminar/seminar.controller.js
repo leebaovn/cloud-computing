@@ -1,4 +1,3 @@
-const { default: Item } = require('antd/lib/list/Item');
 const admin = require('firebase-admin');
 const db = admin.firestore();
 const { Error } = require('../../utils/Error');
@@ -141,10 +140,12 @@ exports.createSeminar = async (req, res, next) => {
 
 exports.updateSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    res.send(404, 'Vui lòng đăng nhập!');
+    // res.send(404, 'Unauthorized!');
+    throw new Error({ statusCode: 404, message: 'Unauthorized' });
   }
   if (req.role === 'audience') {
-    res.send(404, 'Bạn không được phép!');
+    // res.send(404, 'You do not have permission to update seminar!');
+    throw new Error({ statusCode: 404, message: 'Do not have permission' });
   }
 
   try {
@@ -189,10 +190,12 @@ exports.updateSeminar = async (req, res, next) => {
 
 exports.deleteSeminar = async (req, res, next) => {
   if (!req.isAuth) {
-    res.send(404, 'Vui lòng đăng nhập!');
+    // res.send(404, 'Unauthorized!');
+    throw new Error({ statusCode: 404, message: 'Unauthorized' });
   }
   if (req.role === 'audience') {
-    res.send(404, 'Bạn không được phép!');
+    // res.send(404, 'You do not have permission to delete seminar!');
+    throw new Error({ statusCode: 404, message: 'Do not have permission' });
   }
 
   try {
@@ -206,7 +209,9 @@ exports.deleteSeminar = async (req, res, next) => {
       }
       await transaction.delete(docRef);
     });
-    res.send(200, 'Xóa seminar thành công!');
+    // res.send(200, 'Deleted successfully');
+    const success = new Success({});
+    res.status(200).send(success);
   } catch (error) {
     () => next(error);
   }
@@ -278,16 +283,15 @@ exports.joinSeminar = async (req, res, next) => {
     await db.runTransaction(async (transaction) => {
       const seminar = await transaction.get(seminarRef);
       if (!seminar.exists) {
-        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+        throw new Error({
+          statusCode: 404,
+          message: 'seminar not found',
+          error: 'seminar.notFound',
+        });
       }
       const user = await transaction.get(userRef);
-      const {
-        members = [],
-        quantity
-      } = seminar.data();
-      const {
-        seminars = []
-      } = user.data();
+      const { members = [], quantity } = seminar.data();
+      const { seminars = [] } = user.data();
       if (members.length < quantity) {
         members.push(userId);
         seminars.push(id);
@@ -297,10 +301,10 @@ exports.joinSeminar = async (req, res, next) => {
     });
     const success = new Success({});
     res.status(200).send(success);
-  } catch(error) {
+  } catch (error) {
     () => next(error);
   }
-}
+};
 
 exports.cancelSeminar = async (req, res, next) => {
   if (!req.isAuth) {
@@ -314,23 +318,29 @@ exports.cancelSeminar = async (req, res, next) => {
     await db.runTransaction(async (transaction) => {
       const seminar = await transaction.get(seminarRef);
       if (!seminar.exists) {
-        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+        throw new Error({
+          statusCode: 404,
+          message: 'seminar not found',
+          error: 'seminar.notFound',
+        });
       }
       const user = await transaction.get(userRef);
-      const {
-        members
-      } = seminar.data();
-      const {
-        seminars
-      } = user.data();
-      const newMembers = members.filter(item => item !== userId);
-      const newSeminars = seminars.filter(item => item !== id);
-      await transaction.update(seminarRef, { ...seminar.data(), members: newMembers });
-      await transaction.update(userRef, { ...user.data(), seminars: newSeminars });
+      const { members } = seminar.data();
+      const { seminars } = user.data();
+      const newMembers = members.filter((item) => item !== userId);
+      const newSeminars = seminars.filter((item) => item !== id);
+      await transaction.update(seminarRef, {
+        ...seminar.data(),
+        members: newMembers,
+      });
+      await transaction.update(userRef, {
+        ...user.data(),
+        seminars: newSeminars,
+      });
     });
     const success = new Success({});
     res.status(200).send(success);
-  } catch(error) {
+  } catch (error) {
     () => next(error);
   }
-}
+};

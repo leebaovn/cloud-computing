@@ -30,7 +30,7 @@ function SeminarPage() {
   const [categories, setCategories] = useState([]);
 
   const [authState, authDispatch] = useContext(authContext);
-  const { role } = authState;
+  const { role, userId } = authState;
   const [visible, setVisible] = useState(false);
   const [loading, setLoadding] = useState(false);
   const [currentSeminar, setCurrentSeminar] = useState(null);
@@ -58,7 +58,6 @@ function SeminarPage() {
     fetchSeminar();
     fetchCategories();
   }, []);
-
   const handleDecision = async (status) => {
     setLoadding(true);
     try {
@@ -78,7 +77,20 @@ function SeminarPage() {
   };
 
   const handleChangeCategory = (cateId) => {};
-
+  const handleJoinSeminar = async (seminar) => {
+    console.log(seminar, 'zzz');
+    setLoadding(true);
+    const { members, id } = seminar;
+    if (members?.includes(userId)) {
+      //Unjoin
+      await axiosClient.put(`/seminar/cancel/${id}`);
+    } else {
+      //Join
+      await axiosClient.put(`/seminar/join/${id}`);
+    }
+    fetchSeminar();
+    setLoadding(false);
+  };
   return (
     <Layout>
       <Modal
@@ -129,7 +141,7 @@ function SeminarPage() {
           {seminars &&
             seminars?.map((seminar) => (
               <Card
-                key={seminar.authorName}
+                key={seminar.id}
                 hoverable
                 style={{ width: 240, marginRight: '2rem', marginTop: '2rem' }}
                 cover={
@@ -163,7 +175,14 @@ function SeminarPage() {
                       {translateStatus(seminar.status)}
                     </Button>
                   )}
-                  {role === 'audience' && <Button>Tham gia</Button>}
+                  {role === 'audience' && (
+                    <Button
+                      loading={loading}
+                      onClick={() => handleJoinSeminar(seminar)}
+                    >
+                      {seminar?.members?.includes(userId) ? 'Hủy' : 'Tham gia'}
+                    </Button>
+                  )}
                 </div>
               </Card>
             ))}

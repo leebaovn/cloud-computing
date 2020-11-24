@@ -29,6 +29,7 @@ function LoginForm({ history }) {
           token,
           name: tokenDecode.name,
           role: tokenDecode.role,
+          userId: tokenDecode.userId,
         },
       });
       setError(null);

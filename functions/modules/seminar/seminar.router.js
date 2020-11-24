@@ -7,8 +7,13 @@ const {
   getSeminarById,
   deleteSeminar,
   updateSeminar,
+<<<<<<< HEAD
   joinSeminar,
   cancelSeminar,
+=======
+  cancelSeminar,
+  joinSeminar,
+>>>>>>> 697737b4962a5dfc7bfe36721ea097d45c47972c
 } = require('./seminar.controller');
 const { isAuth } = require('../../middlewares/auth.middleware');
 
