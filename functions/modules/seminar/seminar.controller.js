@@ -296,8 +296,8 @@ exports.joinSeminar = async (req, res, next) => {
         members.push(userId);
         seminars.push(id);
       }
-      transaction.update(seminarRef, { ...seminar.data(), members });
-      transaction.update(userRef, { ...user.data(), seminars });
+      await transaction.update(seminarRef, { ...seminar.data(), members });
+      await transaction.update(userRef, { ...user.data(), seminars });
     });
     const success = new Success();
     res.status(200).send(success);
