@@ -1,3 +1,4 @@
+const { default: Item } = require('antd/lib/list/Item');
 const admin = require('firebase-admin');
 const db = admin.firestore();
 const { Error } = require('../../utils/Error');
@@ -99,6 +100,7 @@ exports.createSeminar = async (req, res, next) => {
       location,
       date,
       time,
+      category_id,
     } = req.body;
     if (!title || !date) {
       // res.send(404, 'title and date are required!');
@@ -107,7 +109,7 @@ exports.createSeminar = async (req, res, next) => {
         message: 'title and date are required',
       }).addField(errors, {
         title: 'title is required',
-        date: 'date is required'
+        date: 'date is required',
       });
     }
     const newSeminar = {
@@ -122,11 +124,15 @@ exports.createSeminar = async (req, res, next) => {
       createdBy: req.userId,
       status: 'pending',
       members: [],
+      category_id,
     };
 
     const addedSeminar = await db.collection('seminars').add(newSeminar);
     // res.json({ data: addedSeminar.data() });
-    const success = new Success({ data: addedSeminar.data(), id: addedSeminar.id });
+    const success = new Success({
+      data: addedSeminar.data(),
+      id: addedSeminar.id,
+    });
     res.status(200).send(success);
   } catch (error) {
     () => next(error);
@@ -160,6 +166,7 @@ exports.updateSeminar = async (req, res, next) => {
         location,
         date,
         time,
+        category_id,
       } = req.body;
       const data = {
         title,
@@ -169,6 +176,7 @@ exports.updateSeminar = async (req, res, next) => {
         location,
         date,
         time,
+        category_id,
       };
       transaction.update(docRef, data);
     });
@@ -209,3 +217,126 @@ exports.deleteSeminar = async (req, res, next) => {
     () => next(error);
   }
 };
+
+exports.getSeminarsByCategory = async (req, res, next) => {
+  if (!req.isAuth) {
+    throw new Error({ statusCode: 404, message: 'Unauthorized' });
+  }
+
+  try {
+    const { category_id } = req.params;
+    if (req.role === 'speaker') {
+      const snapshot = await db
+        .collection('seminars')
+        .where('createdBy', '==', req.userId)
+        .where('category_id', '==', category_id)
+        .get();
+      const mySeminars = snapshot.docs.map((seminar) => {
+        return {
+          ...seminar.data(),
+          id: seminar.id,
+        };
+      });
+      const success = new Success({ data: mySeminars });
+      res.status(200).send(success);
+    } else if (req.role === 'admin') {
+      const snapshot = await db
+        .collection('seminars')
+        .where('category_id', '==', category_id)
+        .get();
+      const seminars = snapshot.docs.map((seminar) => {
+        return {
+          ...seminar.data(),
+          id: seminar.id,
+        };
+      });
+      const success = new Success({ data: seminars });
+      res.status(200).send(success);
+    } else {
+      const snapshot = await db
+        .collection('seminars')
+        .where('status', '==', 'accepted')
+        .where('category_id', '==', category_id)
+        .get();
+      const seminars = snapshot.docs.map((seminar) => {
+        return {
+          ...seminar.data(),
+          id: seminar.id,
+        };
+      });
+      const success = new Success({ data: seminars });
+      res.status(200).send(success);
+    }
+  } catch (error) {
+    () => next(error);
+  }
+};
+
+exports.joinSeminar = async (req, res, next) => {
+  if (!req.isAuth) {
+    throw new Error({ statusCode: 404, message: 'Unauthorized' });
+  }
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+    const seminarRef = await db.collection('seminars').doc(id);
+    const userRef = await db.collection('users').doc(userId);
+    await db.runTransaction(async (transaction) => {
+      const seminar = await transaction.get(seminarRef);
+      if (!seminar.exists) {
+        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+      }
+      const user = await transaction.get(userRef);
+      const {
+        members,
+        quantity
+      } = seminar.data();
+      const {
+        seminars
+      } = user.data();
+      if (members.length < quantity) {
+        members.push(userId);
+        seminars.push(id);
+      }
+      transaction.update(seminarRef, { ...seminar.data(), members });
+      transaction.update(userRef, { ...user.data(), seminars });
+    });
+    const success = new Success();
+    res.status(200).send(success);
+  } catch(error) {
+    () => next(error);
+  }
+}
+
+exports.cancelSeminar = async (req, res, next) => {
+  if (!req.isAuth) {
+    throw new Error({ statusCode: 404, message: 'Unauthorized' });
+  }
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+    const seminarRef = await db.collection('seminars').doc(id);
+    const userRef = await db.collection('users').doc(userId);
+    await db.runTransaction(async (transaction) => {
+      const seminar = await transaction.get(seminarRef);
+      if (!seminar.exists) {
+        throw new Error({ statusCode: 404, message: 'seminar not found', error: 'seminar.notFound' });
+      }
+      const user = await transaction.get(userRef);
+      const {
+        members
+      } = seminar.data();
+      const {
+        seminars
+      } = user.data();
+      const newMembers = members.filter(item => item !== userId);
+      const newSeminars = seminars.filter(item => item !== id);
+      transaction.update(seminarRef, { ...seminar.data(), newMembers });
+      transaction.update(userRef, { ...user.data(), newSeminars });
+    });
+    const success = new Success();
+    res.status(200).send(success);
+  } catch(error) {
+    () => next(error);
+  }
+}
