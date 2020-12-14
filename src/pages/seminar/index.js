@@ -9,6 +9,8 @@ import './seminar.style.css';
 import openNotification, {
   typeNotification,
 } from './../../Components/notification';
+import { db } from './../../firebase/firebase';
+
 const { Meta } = Card;
 const { Option } = Select;
 
