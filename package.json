@@ -5,6 +5,7 @@
   "dependencies": {
     "antd": "^4.6.6",
     "axios": "^0.20.0",
+    "bcrypt": "^5.0.0",
     "dotenv": "^8.2.0",
     "firebase": "^7.23.0",
     "jsonwebtoken": "^8.5.1",

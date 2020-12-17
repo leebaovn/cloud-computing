@@ -1,5 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const myPlaintextPassword = 's0//P4$$w0rD';
 
 require('dotenv').config();
 const express = require('express');
@@ -109,9 +112,12 @@ app.post('/createuser', async (req, res) => {
         message: 'Email này đã tồn tại. Vui lòng chọn email khác!',
       });
     }
+
+    const hashpassword = bcrypt.hashSync(password, saltRounds);
+
     const newUser = {
       email,
-      password,
+      password: hashpassword,
       name,
       role,
       studentId,
@@ -209,13 +215,17 @@ app.post('/login', async (req, res) => {
       .collection('users')
       .where('email', '==', email)
       .get();
+
     if (userFound.empty) {
       res.json({ message: 'Email hoặc mật khẩu không chính xác!' });
     }
     let ok = false;
     let user;
+
     userFound.forEach((doc) => {
-      if (password === doc.data().password) {
+      const pwd = bcrypt.compareSync(password, doc.data().password);
+
+      if (pwd) {
         ok = true;
         user = { ...doc.data(), userId: doc.id };
       }
@@ -270,6 +280,7 @@ app.get('/users', async (req, res) => {
 // app.put('/update-seminar/:id', deleteSeminar);
 // app.post('/create-seminar', createSeminar);
 const seminarRouter = require('./modules/seminar/seminar.router');
+const { hash } = require('bcrypt');
 app.use('/seminar', seminarRouter);
 
 //create new category
