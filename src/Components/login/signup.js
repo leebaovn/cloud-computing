@@ -52,7 +52,7 @@ function Signup({ history }) {
           <input
             type='radio'
             name='role'
-            value='Diễn giả'
+            value='speaker'
             id='speaker'
             onChange={(e) => setRole(e.target.value)}
           />
@@ -60,7 +60,7 @@ function Signup({ history }) {
           <input
             type='radio'
             name='role'
-            value='Khán giả'
+            value='audience'
             checked
             onChange={(e) => setRole(e.target.value)}
             id='audience'

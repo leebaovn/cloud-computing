@@ -34,7 +34,7 @@ const columnUser = [
     dataIndex: '',
     key: 'join',
     render: (_, record) => {
-      return <p>{record.join || 10}</p>;
+      return <p>{record?.seminars?.length || 0}</p>;
     },
   },
 ];
@@ -60,7 +60,10 @@ function SeminarPage() {
         <Table
           columns={columnUser}
           dataSource={users}
-          pagination={false}
+          pagination={{
+            pageSize: 10,
+            hideOnSinglePage: true,
+          }}
           loading={loading}
         />
       </div>

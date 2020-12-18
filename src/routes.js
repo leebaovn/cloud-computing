@@ -28,6 +28,7 @@ function Routes() {
 
       <PrivateRoute path='/seminar-management' component={Seminar} />
       <PrivateRoute path='/categories' component={Category} />
+      <PrivateRoute path='/seminar-joining' component={Seminar} />
 
       <PrivateRoute path='/' component={Seminar} />
     </Switch>

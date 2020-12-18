@@ -125,7 +125,7 @@ exports.createSeminar = async (req, res, next) => {
       members: [],
       category_id,
     };
-
+    console.log(newSeminar, 'zzzzzzzz');
     const addedSeminar = await db.collection('seminars').add(newSeminar);
     // res.json({ data: addedSeminar.data() });
     const success = new Success({

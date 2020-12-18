@@ -22,6 +22,7 @@ const { Option } = Select;
 const DrawerForm = ({ fetchSeminar }) => {
   const [visible, setVisible] = useState(false);
   const [fileSelect, setFileSelect] = useState();
+  const [loading, setLoading] = useState(false);
   const [imgUrl, setImgUrl] = useState('');
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
@@ -42,6 +43,7 @@ const DrawerForm = ({ fetchSeminar }) => {
   }, []);
 
   const handleUpload = (e) => {
+    setLoading(true);
     if (e.target.files) {
       const userId = window.localStorage.getItem('userId');
       const fileChoosen = e.target.files[0];
@@ -64,9 +66,11 @@ const DrawerForm = ({ fetchSeminar }) => {
         }
       );
     }
+    setLoading(false);
   };
 
   const onCreateSeminar = async (e) => {
+    setLoading(true);
     try {
       await axios.post('/createseminar', {
         title: e.title,
@@ -82,6 +86,8 @@ const DrawerForm = ({ fetchSeminar }) => {
       onClose();
       fetchSeminar();
       form.resetFields();
+      setFileSelect(null);
+      setImgUrl('');
       openNotification(
         typeNotification.success,
         'Seminar đã được tạo thành công!'
@@ -89,6 +95,7 @@ const DrawerForm = ({ fetchSeminar }) => {
     } catch (err) {
       openNotification(typeNotification.error, 'Đã có lỗi xảy ra!');
     }
+    setLoading(false);
   };
   return (
     <>
@@ -108,15 +115,17 @@ const DrawerForm = ({ fetchSeminar }) => {
             <Col span={6}>
               <Form.Item label='Hình ảnh'>
                 <input type='file' onChange={handleUpload} />
-                {imgUrl && (
+                {loading && !imgUrl ? (
+                  'Loading...'
+                ) : imgUrl ? (
                   <img
                     src={imgUrl}
                     alt='thumbnail'
                     width='600'
                     height='250'
-                    style={{ marginTop: 10 }}
+                    style={{ marginTop: 10, objectFit: 'contain' }}
                   />
-                )}
+                ) : null}
               </Form.Item>
             </Col>
           </Row>
@@ -223,7 +232,7 @@ const DrawerForm = ({ fetchSeminar }) => {
                 >
                   Hủy bỏ
                 </Button>
-                <Button type='primary' htmlType='submit'>
+                <Button type='primary' htmlType='submit' loading={loading}>
                   Tạo
                 </Button>
               </Form.Item>

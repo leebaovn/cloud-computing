@@ -8,7 +8,7 @@ import authContext, { AuthAction } from './../../contexts/auth/auth-context';
 export const SidebarMenu = [
   {
     name: 'My seminar',
-    path: 'my-seminar',
+    path: 'seminar',
     exact: true,
     roleAccess: ['speaker'],
   },
@@ -37,14 +37,14 @@ export const SidebarMenu = [
     roleAccess: ['admin'],
   },
   {
-    name: 'Seminar Join',
-    path: 'seminarjoining',
+    name: 'Đã tham gia',
+    path: 'seminar-joining',
     exact: true,
-    roleAccess: ['anudience'],
+    roleAccess: ['audience'],
   },
 ];
 
-function Sidebar(props) {
+function Sidebar() {
   const [authState, authDispatch] = useContext(authContext);
   const { role, name } = authState;
   const logout = () => {
@@ -53,15 +53,15 @@ function Sidebar(props) {
   return (
     <div className='header'>
       <div className='userInfo'>
-        <div className='userInfo__avt'>
+        {/* <div className='userInfo__avt'>
           <img
             src='https://lovicouple.com/wp-content/uploads/2019/12/avt-doi-cute.jpg'
             alt='avatar'
           />
-        </div>
+        </div> */}
         <div className='userInfo__name'>{name}</div>
       </div>
-      <Divider style={{ marginTop: 0 }} />
+      <Divider style={{ marginTop: 0, background: '#000' }} />
       <div className='sidebar'>
         <ul className='sidebar__container'>
           {SidebarMenu.filter((item) => item.roleAccess.indexOf(role) >= 0).map(

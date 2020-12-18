@@ -280,7 +280,7 @@ app.get('/users', async (req, res) => {
 // app.put('/update-seminar/:id', deleteSeminar);
 // app.post('/create-seminar', createSeminar);
 const seminarRouter = require('./modules/seminar/seminar.router');
-const { hash } = require('bcrypt');
+
 app.use('/seminar', seminarRouter);
 
 //create new category

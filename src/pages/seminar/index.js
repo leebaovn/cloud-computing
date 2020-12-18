@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import Toolbar from './../../Components/Toolbar';
 import Layout from './../../Components/Layout';
 import { Button, Card, Modal, Select } from 'antd';
@@ -9,7 +10,6 @@ import './seminar.style.css';
 import openNotification, {
   typeNotification,
 } from './../../Components/notification';
-import { db } from './../../firebase/firebase';
 
 const { Meta } = Card;
 const { Option } = Select;
@@ -19,7 +19,7 @@ function translateStatus(status) {
     case 'accepted':
       return 'Chấp thuận';
     case 'pending':
-      return 'Chờ đợi';
+      return 'Chờ duyệt';
     case 'denied':
       return 'Đã hủy';
     default:
@@ -28,6 +28,7 @@ function translateStatus(status) {
 }
 
 function SeminarPage() {
+  const { pathname } = useLocation();
   const [seminars, setSeminars] = useState([]);
   const [categories, setCategories] = useState([]);
 
@@ -51,15 +52,22 @@ function SeminarPage() {
     setLoadding(false);
   };
   const fetchSeminar = async () => {
-    const seminars = await axiosClient.get('/seminar');
-    if (!seminars.empty) {
-      setSeminars(seminars.data);
+    const { data } = await axiosClient.get('/seminar');
+    const userId = localStorage.getItem('userId');
+    const role = localStorage.getItem('role');
+    if (pathname !== '/seminar' && role !== 'admin') {
+      const _data = data.filter((seminar) =>
+        seminar?.members?.includes(userId)
+      );
+      setSeminars(_data);
+    } else {
+      setSeminars(data);
     }
   };
   useEffect(() => {
     fetchSeminar();
     fetchCategories();
-  }, []);
+  }, [pathname]);
   const handleDecision = async (status) => {
     setLoadding(true);
     try {
@@ -78,7 +86,9 @@ function SeminarPage() {
     setLoadding(false);
   };
 
-  const handleChangeCategory = (cateId) => {};
+  const handleChangeCategory = (cateId) => {
+    console.log(seminars, '333333333');
+  };
   const handleJoinSeminar = async (seminar) => {
     console.log(seminar, 'zzz');
     setLoadding(true);
@@ -96,12 +106,12 @@ function SeminarPage() {
   return (
     <Layout>
       <Modal
-        title='Permission'
+        title='Cho phép diễn ra seminar'
         visible={visible}
         onCancel={() => setVisible(false)}
         footer={[
           <Button key='close' onClick={() => setVisible(false)}>
-            Cancel
+            Quyết định sau
           </Button>,
           <Button
             htmlType='submit'
@@ -111,7 +121,7 @@ function SeminarPage() {
             danger
             onClick={() => handleDecision('denied')}
           >
-            Deny
+            Từ chối
           </Button>,
           <Button
             htmlType='submit'
@@ -120,7 +130,7 @@ function SeminarPage() {
             loading={loading}
             onClick={() => handleDecision('accepted')}
           >
-            Accept
+            Chấp thuận
           </Button>,
         ]}
       >
@@ -157,7 +167,9 @@ function SeminarPage() {
               >
                 <Meta title={seminar.title} description={seminar.description} />
                 <div className='seminar__info'>
-                  <div>{`30/${seminar.quantity}`}</div>
+                  <div>{`${seminar?.members?.length || 0}/${
+                    seminar.quantity
+                  }`}</div>
                   {role !== 'audience' && (
                     <Button
                       style={{
@@ -193,6 +205,9 @@ function SeminarPage() {
                 </div>
               </Card>
             ))}
+          {pathname !== '/seminar' &&
+            pathname !== '/' &&
+            seminars.length === 0 && <div>Bạn chưa tham gia seminar nào</div>}
         </div>
       </div>
     </Layout>
